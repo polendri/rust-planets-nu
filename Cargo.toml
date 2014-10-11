@@ -1,0 +1,9 @@
+[package]
+
+name = "rust-planetsNu"
+version = "0.0.1"
+authors = ["Paul Hendry <paul@pshendry.com>"]
+
+[dependencies.rust-http]
+
+git = https://github.com/chris-morgan/rust-http.git
