@@ -251,8 +251,9 @@ pub struct GameInfo<'a> {
 
 pub fn game_info_json(game_id: i64) -> io::IoResult<String> {
     let url = "http://api.planets.nu/game/loadinfo?gameid=".to_string() + game_id.to_string();
-    let reader: Box<Reader> = try!(curl::http_get(url.as_slice()));
-    match zlib::Decoder::new(reader).read_to_string() {
+    let reader = try!(curl::http_get(url.as_slice()));
+    let decoder = zlib::Decoder::new(reader);
+    match decoder.read_to_string() {
         Ok(s) => Ok(s),
         Err(error) => Err(format!("kind: {0}\n desc: {1}", error.kind, error.desc)),
     }
