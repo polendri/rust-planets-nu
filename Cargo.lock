@@ -2,9 +2,15 @@
 name = "rust-planetsNu"
 version = "0.0.1"
 dependencies = [
+ "compress 0.0.1 (git+https://github.com/alexcrichton/rust-compress.git#36a8bad0d2c9e79371d8cf601b6b7ecbbadbbd42)",
  "http 0.1.0-pre (git+https://github.com/chris-morgan/rust-http.git#b929e4c16f9cff0d1c7334a2b39320be354fa0b0)",
  "url 0.1.0 (git+https://github.com/servo/rust-url.git#55b18b796ef2cef5490069dd450c60c2cc2c0c1b)",
 ]
+
+[[package]]
+name = "compress"
+version = "0.0.1"
+source = "git+https://github.com/alexcrichton/rust-compress.git#36a8bad0d2c9e79371d8cf601b6b7ecbbadbbd42"
 
 [[package]]
 name = "encoding"

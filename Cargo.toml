@@ -4,6 +4,10 @@ name = "rust-planetsNu"
 version = "0.0.1"
 authors = ["Paul Hendry <paul@pshendry.com>"]
 
+[dependencies.compress]
+
+git = "https://github.com/alexcrichton/rust-compress.git"
+
 [dependencies.http]
 
 git = "https://github.com/chris-morgan/rust-http.git"
