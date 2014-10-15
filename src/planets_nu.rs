@@ -1,10 +1,8 @@
-extern crate compress;
 extern crate encoding;
 
 use curl;
 use self::encoding::{Encoding, DecodeStrict};
 use self::encoding::all::UTF_8;
-use self::compress::zlib;
 use std::io;
 
 // Common structs
@@ -253,12 +251,19 @@ pub struct GameInfo<'a> {
 }
 
 pub fn game_info_json(game_id: i64) -> Result<String, String> {
-    //let url = "http://api.planets.nu/game/loadinfo?gameid=".to_string() + game_id.to_string();
-    let url = "http://www.google.ca/".to_string();
-    let mut response = match curl::http_get(url.as_slice()) {
+    let url = "http://api.planets.nu/game/loadinfo?gameid=".to_string() + game_id.to_string();
+    let mut reader = match curl::http_get(url.as_slice()) {
         Ok(x) => x,
         Err(error) => return Err(format!("Error of kind '{}' during HTTP GET request.", error.kind)),
     };
+    let path = Path::new("/home/pshendry/temp/test.txt");
+    let mut file = match io::File::create(&path) {
+        Ok(x) => x,
+        Err(error) => return Err("error creating file".to_string()),
+    };
+    file.write(reader.read_to_end().unwrap().as_slice());
+    Ok("lool".to_string())
+    /*
     let encoding = response.headers.content_encoding.clone();
     let body_bytes = match encoding {
         Some(encoding) => match encoding.as_slice() {
@@ -288,14 +293,21 @@ pub fn game_info_json(game_id: i64) -> Result<String, String> {
         Err(error) => return Err("error creating file".to_string()),
     };
     file.write_str(body_str.as_slice());
-    Ok("lool".to_string())
+    */
 }
 
+fn test(par: &int) -> Result<int, int> {
+    Err(12)
+}
 
 #[test]
 fn dummy_test() {
+    let x = 5;
+    test(&x);
+    /*
     match game_info_json(115840i64) {
         Ok(json) => assert_eq!("loool".to_string(), json),
         Err(error) => fail!(error),
     };
+    */
 }

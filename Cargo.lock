@@ -2,21 +2,21 @@
 name = "rust-planetsNu"
 version = "0.0.1"
 dependencies = [
- "compress 0.0.1 (git+https://github.com/alexcrichton/rust-compress.git#36a8bad0d2c9e79371d8cf601b6b7ecbbadbbd42)",
  "encoding 0.1.0 (git+https://github.com/lifthrasiir/rust-encoding.git#16aff34b35e68b0f3a23e4d9dcff4f23cea2a414)",
+ "flate2 0.0.1 (git+https://github.com/alexcrichton/flate2-rs#68971ae77a523c7ec3f19b4bcd195f76291ea390)",
  "http 0.1.0-pre (git+https://github.com/chris-morgan/rust-http.git#7f41166f0fa376536830d314ac4070614fa9652e)",
  "url 0.1.0 (git+https://github.com/servo/rust-url.git#55b18b796ef2cef5490069dd450c60c2cc2c0c1b)",
 ]
 
 [[package]]
-name = "compress"
-version = "0.0.1"
-source = "git+https://github.com/alexcrichton/rust-compress.git#36a8bad0d2c9e79371d8cf601b6b7ecbbadbbd42"
-
-[[package]]
 name = "encoding"
 version = "0.1.0"
 source = "git+https://github.com/lifthrasiir/rust-encoding.git#16aff34b35e68b0f3a23e4d9dcff4f23cea2a414"
+
+[[package]]
+name = "flate2"
+version = "0.0.1"
+source = "git+https://github.com/alexcrichton/flate2-rs#68971ae77a523c7ec3f19b4bcd195f76291ea390"
 
 [[package]]
 name = "http"
