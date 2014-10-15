@@ -1,6 +1,9 @@
 extern crate compress;
+extern crate encoding;
 
 use curl;
+use self::encoding::{Encoding, DecodeStrict};
+use self::encoding::all::UTF_8;
 use self::compress::zlib;
 use std::io;
 
@@ -249,23 +252,43 @@ pub struct GameInfo<'a> {
     pub relations: &'a [Relation],
 }
 
-pub fn game_info_json(game_id: i64) -> Result<String> {
-    let url = "http://api.planets.nu/game/loadinfo?gameid=".to_string() + game_id.to_string();
-    let mut reader = match curl::http_get(url.as_slice()) {
-        Ok(reader) => reader,
+pub fn game_info_json(game_id: i64) -> Result<String, String> {
+    //let url = "http://api.planets.nu/game/loadinfo?gameid=".to_string() + game_id.to_string();
+    let url = "http://www.google.ca/".to_string();
+    let mut response = match curl::http_get(url.as_slice()) {
+        Ok(x) => x,
         Err(error) => return Err(format!("Error of kind '{}' during HTTP GET request.", error.kind)),
     };
-    let reader_str = match reader.read_to_string() {
+    let encoding = response.headers.content_encoding.clone();
+    let body_bytes = match encoding {
+        Some(encoding) => match encoding.as_slice() {
+            "gzip" => {
+                let mut decoder = zlib::Decoder::new(response);
+                match decoder.read_to_end() {
+                    Ok(x) => x,
+                    Err(error) => return Err(format!("Error of kind '{}' during gzip deflation.", error.kind)),
+                }
+            },
+            _ => fail!("bleh"),//body_bytes,
+        },
+        None => {
+            match response.read_to_end() {
+                Ok(x) => fail!("heh"),//x,
+                Err(error) => return Err(format!("Error of kind '{}' while reading response body.", error.kind)),
+            }
+        },
+    };
+    let body_str = match UTF_8.decode(body_bytes.as_slice(), DecodeStrict) {
+        Ok(x) => x,
+        Err(error) => return Err(format!("Error during decoding of the HTTP response: {}", error)),
     };
     let path = Path::new("/home/pshendry/temp/test.txt");
-    let mut file = try!(io::File::create(&path));
-    try!(file.write_str(reader_str.as_slice()));
+    let mut file = match io::File::create(&path) {
+        Ok(x) => x,
+        Err(error) => return Err("error creating file".to_string()),
+    };
+    file.write_str(body_str.as_slice());
     Ok("lool".to_string())
-    //let decoder = zlib::Decoder::new(reader);
-    //match decoder.read_to_string() {
-        //Ok(s) => Ok(s),
-        //Err(error) => Err(format!("kind: {0}\n desc: {1}", error.kind, error.desc)),
-    //}
 }
 
 
@@ -273,6 +296,6 @@ pub fn game_info_json(game_id: i64) -> Result<String> {
 fn dummy_test() {
     match game_info_json(115840i64) {
         Ok(json) => assert_eq!("loool".to_string(), json),
-        Err(error) => fail!("kind: {0}\ndesc: {1}\ndetail: {2}", error.kind, error.desc, error.detail),
-    }
+        Err(error) => fail!(error),
+    };
 }
