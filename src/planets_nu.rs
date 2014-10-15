@@ -249,14 +249,23 @@ pub struct GameInfo<'a> {
     pub relations: &'a [Relation],
 }
 
-pub fn game_info_json(game_id: i64) -> io::IoResult<String> {
+pub fn game_info_json(game_id: i64) -> Result<String> {
     let url = "http://api.planets.nu/game/loadinfo?gameid=".to_string() + game_id.to_string();
-    let reader = try!(curl::http_get(url.as_slice()));
-    let decoder = zlib::Decoder::new(reader);
-    match decoder.read_to_string() {
-        Ok(s) => Ok(s),
-        Err(error) => Err(format!("kind: {0}\n desc: {1}", error.kind, error.desc)),
-    }
+    let mut reader = match curl::http_get(url.as_slice()) {
+        Ok(reader) => reader,
+        Err(error) => return Err(format!("Error of kind '{}' during HTTP GET request.", error.kind)),
+    };
+    let reader_str = match reader.read_to_string() {
+    };
+    let path = Path::new("/home/pshendry/temp/test.txt");
+    let mut file = try!(io::File::create(&path));
+    try!(file.write_str(reader_str.as_slice()));
+    Ok("lool".to_string())
+    //let decoder = zlib::Decoder::new(reader);
+    //match decoder.read_to_string() {
+        //Ok(s) => Ok(s),
+        //Err(error) => Err(format!("kind: {0}\n desc: {1}", error.kind, error.desc)),
+    //}
 }
 
 
@@ -264,6 +273,6 @@ pub fn game_info_json(game_id: i64) -> io::IoResult<String> {
 fn dummy_test() {
     match game_info_json(115840i64) {
         Ok(json) => assert_eq!("loool".to_string(), json),
-        Err(error) => fail!(error),
+        Err(error) => fail!("kind: {0}\ndesc: {1}\ndetail: {2}", error.kind, error.desc, error.detail),
     }
 }
