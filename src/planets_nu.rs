@@ -1,8 +1,11 @@
 extern crate encoding;
+extern crate serialize;
 
 use curl;
 use self::encoding::{Encoding, DecodeStrict};
 use self::encoding::all::UTF_8;
+use self::serialize::json;
+use std::char;
 use std::io;
 
 // Common structs
@@ -48,6 +51,7 @@ pub struct LoginResult<'a> {
     pub player_settings: PlayerSettings,
 }
 
+/*
 // Game Info structs
 
 pub struct Game<'a> {
@@ -249,56 +253,41 @@ pub struct GameInfo<'a> {
     pub player_infos: &'a [PlayerInfo<'a>],
     pub relations: &'a [Relation],
 }
+*/
 
+fn to_rgb(rgb_str: &str) -> Result<RGB, String> {
+    if (rgb_str.len() != 7) {
+        return Err(format!("Unexpected RGB string length (was {}, not 7)", rgb_str.len()));
+    }
+    let r = char::to_digit(rgb_str[0], ) // TODO
+}
+
+fn decode_login_response(json: &str) -> Result<LoginResult, String> {
+    let root_enum = match json::from_str(json) {
+        Ok(x) => x,
+        Err(error) => return Err(format!("Error while decoding the login response: {}", error)),
+    };
+    let root_tree = match root_enum {
+        Object(x) => x,
+        _ => return Err("Could not find root of login response."),
+    };
+    match root_tree.find("success") {
+        Some(success_enum) => match success_enum {
+            Boolean(success) => if !success {
+                return Err("Response indicates failure.")
+            },
+            _ => Err("Unexpected value for the 'success' key."),
+        },
+        None => Err("Could not find 'success' key."),
+    },
+    let player_planet_colors = ( // TODO
+
+}
+
+/*
 pub fn game_info_json(game_id: i64) -> Result<String, String> {
     let url = "http://api.planets.nu/game/loadinfo?gameid=".to_string() + game_id.to_string();
-    let mut reader = match curl::http_get(url.as_slice()) {
-        Ok(x) => x,
-        Err(error) => return Err(format!("Error of kind '{}' during HTTP GET request.", error.kind)),
-    };
-    let path = Path::new("/home/pshendry/temp/test.txt");
-    let mut file = match io::File::create(&path) {
-        Ok(x) => x,
-        Err(error) => return Err("error creating file".to_string()),
-    };
-    file.write(reader.read_to_end().unwrap().as_slice());
-    Ok("lool".to_string())
-    /*
-    let encoding = response.headers.content_encoding.clone();
-    let body_bytes = match encoding {
-        Some(encoding) => match encoding.as_slice() {
-            "gzip" => {
-                let mut decoder = zlib::Decoder::new(response);
-                match decoder.read_to_end() {
-                    Ok(x) => x,
-                    Err(error) => return Err(format!("Error of kind '{}' during gzip deflation.", error.kind)),
-                }
-            },
-            _ => fail!("bleh"),//body_bytes,
-        },
-        None => {
-            match response.read_to_end() {
-                Ok(x) => fail!("heh"),//x,
-                Err(error) => return Err(format!("Error of kind '{}' while reading response body.", error.kind)),
-            }
-        },
-    };
-    let body_str = match UTF_8.decode(body_bytes.as_slice(), DecodeStrict) {
-        Ok(x) => x,
-        Err(error) => return Err(format!("Error during decoding of the HTTP response: {}", error)),
-    };
-    let path = Path::new("/home/pshendry/temp/test.txt");
-    let mut file = match io::File::create(&path) {
-        Ok(x) => x,
-        Err(error) => return Err("error creating file".to_string()),
-    };
-    file.write_str(body_str.as_slice());
-    */
-}
-
-fn test(par: &int) -> Result<int, int> {
-    Err(12)
-}
+*/
 
 #[test]
 fn dummy_test() {
