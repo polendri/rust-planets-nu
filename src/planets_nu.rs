@@ -1,12 +1,18 @@
 extern crate encoding;
 extern crate serialize;
 
-use curl;
-use self::encoding::{Encoding, DecodeStrict};
-use self::encoding::all::UTF_8;
 use self::serialize::json;
 use std::char;
-use std::io;
+use std::cmp;
+use std::str;
+
+use curl;
+
+// Macros
+
+macro_rules! find_match(
+    ($i:ident, $e1:expr, $p:pat => $e2:expr) => (try_match!(*expect!($i.find(&$e1.to_string()), str::Owned(format!("Could not find key '{}'.", $e1))), $p => $e2, str::Owned(format!("Unexpected type for key '{}'.", $e1))))
+)
 
 // Common structs
 
@@ -20,6 +26,7 @@ pub struct RGB {
 
 pub struct PlayerSettings {
     pub player_planet_colors: (RGB, RGB),
+    /*
     pub enemy_planet_colors: (RGB, RGB),
     pub ally_planet_colors: (RGB, RGB),
     pub info_planet_colors: (RGB, RGB),
@@ -39,16 +46,20 @@ pub struct PlayerSettings {
     pub battle_task_id: i64,
     pub battle_tutorial_id: i64,
     pub id: i64,
+    */
 }
 
+/*
 pub struct LoginRequest<'a> {
     pub username: &'a str,
     pub password: &'a str,
 }
+*/
 
-pub struct LoginResult<'a> {
-    pub api_key: &'a str,
-    pub player_settings: PlayerSettings,
+#[deriving(Eq, PartialEq, Show)]
+pub struct LoginResult {
+    pub api_key: String,
+    //pub player_settings: PlayerSettings,
 }
 
 /*
@@ -255,33 +266,36 @@ pub struct GameInfo<'a> {
 }
 */
 
-fn to_rgb(rgb_str: &str) -> Result<RGB, String> {
-    if (rgb_str.len() != 7) {
-        return Err(format!("Unexpected RGB string length (was {}, not 7)", rgb_str.len()));
+fn to_rgb(rgb_str: &str) -> Result<RGB, str::MaybeOwned> {
+    let len_msg = str::Slice("RGB string is too short.");
+    let digit_msg = str::Slice("Encountered a non-hex digit.");
+    if rgb_str.len() != 7 {
+        return Err(str::Slice("Unexpected RGB string length."));
     }
-    let r = char::to_digit(rgb_str[0], ) // TODO
+    let mut iter = rgb_str.chars();
+    try_match!(expect!(iter.next(), len_msg), '#' => (), str::Slice("Could not find leading '#'."));
+    let r = (expect!(char::to_digit(expect!(iter.next(), len_msg), 16), digit_msg) << 4) +
+        expect!(char::to_digit(expect!(iter.next(), len_msg), 16), digit_msg);
+    let g = (expect!(char::to_digit(expect!(iter.next(), len_msg), 16), digit_msg) << 4) +
+        expect!(char::to_digit(expect!(iter.next(), len_msg), 16), digit_msg);
+    let b = (expect!(char::to_digit(expect!(iter.next(), len_msg), 16), digit_msg) << 4) +
+        expect!(char::to_digit(expect!(iter.next(), len_msg), 16), digit_msg);
+    Ok(RGB { red: r as u8, green: g as u8, blue: b as u8 })
 }
 
-fn decode_login_response(json: &str) -> Result<LoginResult, String> {
+fn decode_login_response(json: &str) -> Result<LoginResult, str::MaybeOwned> {
     let root_enum = match json::from_str(json) {
         Ok(x) => x,
-        Err(error) => return Err(format!("Error while decoding the login response: {}", error)),
+        Err(error) => return Err(str::Owned(format!("Error while decoding the login response: {}", error))),
     };
-    let root_tree = match root_enum {
-        Object(x) => x,
-        _ => return Err("Could not find root of login response."),
+    let root_tree = try_match!(root_enum, json::Object(x) => x, str::Slice("Could not find root of login response"));
+    let success = find_match!(root_tree, "success", json::Boolean(x) => x);
+    if !success {
+        return Err(str::Slice("Response indicates failure."));
     };
-    match root_tree.find("success") {
-        Some(success_enum) => match success_enum {
-            Boolean(success) => if !success {
-                return Err("Response indicates failure.")
-            },
-            _ => Err("Unexpected value for the 'success' key."),
-        },
-        None => Err("Could not find 'success' key."),
-    },
-    let player_planet_colors = ( // TODO
-
+    Ok(LoginResult {
+        api_key: find_match!(root_tree, "apikey", json::String(ref x) => x.clone()),
+    })
 }
 
 /*
@@ -290,13 +304,8 @@ pub fn game_info_json(game_id: i64) -> Result<String, String> {
 */
 
 #[test]
-fn dummy_test() {
-    let x = 5;
-    test(&x);
-    /*
-    match game_info_json(115840i64) {
-        Ok(json) => assert_eq!("loool".to_string(), json),
-        Err(error) => fail!(error),
-    };
-    */
+fn test_decode_login_response() {
+    let json = "{ \"apikey\" : \"2ee5dbee-55a8-45e1-ab16-2f72b59c0158\", \"success\" : true }";
+    let result = LoginResult { api_key: "2ee5dbee-55a8-45e1-ab16-2f72b59c0158".to_string() };
+    assert_eq!(result, decode_login_response(json).unwrap());
 }
