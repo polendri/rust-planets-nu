@@ -34,4 +34,3 @@ pub mod request;
 
 mod builders;
 mod common;
-mod curl;

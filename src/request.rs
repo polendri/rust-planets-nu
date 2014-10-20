@@ -1,33 +1,52 @@
 /*!
 Functions to make requests against the planets.nu API.
 */
-use curl;
+extern crate curl;
+
+use self::curl::http;
+use std::str;
+
 use error;
 use builders::login;
 pub use builders::login::LoginResult;
 use parse;
 
-/// Performs an HTTP GET or POST as appropriate, and returns
-/// the resulting JSON (or an error if it fails).
-fn get_json(url: &str, data: Option<String>) -> Result<String, error::Error> {
-    let result = match data {
-        Some(data) => curl::http_post(url, data.as_slice()),
-        None => curl::http_get(url),
-    };
-    let mut reader = try!(result.map_err(
-        |x| error::Error::new(error::NetworkError, x.desc.to_string())));
-    reader.read_to_string().map_err(
-        |x| error::Error::new(error::NetworkError, x.desc.to_string()))
+/// Performs an HTTP GET request, returning the response (or an error).
+fn http_get(url: &str) -> Result<http::Response, error::Error> {
+    match http::handle().get(url).exec() {
+        Ok(x) => Ok(x),
+        Err(code) => Err(error::Error::new(
+            error::NetworkError,
+            format!("curl GET request failed with error code {}", code))),
+    }
+}
+
+/// Performs an HTTP POST request, returning the response (or an error).
+fn http_post(url: &str, data: &str) -> Result<http::Response, error::Error> {
+    match http::handle().post(url, data).exec() {
+        Ok(x) => Ok(x),
+        Err(code) => Err(error::Error::new(
+            error::NetworkError,
+            format!("curl POST request failed with error code {}", code))),
+    }
+}
+
+fn bytes_to_str<'a>(bytes: &'a [u8]) -> Result<&'a str, error::Error> {
+    match str::from_utf8(bytes) {
+        Some(s) => Ok(s),
+        None => Err(error::Error::new(
+            error::NetworkError,
+            "Response body is not valid UTF-8.".to_string())),
+    }
 }
 
 /// Make a call to the login API.
 ///
 /// TODO: Way more documentation; code examples.
 pub fn login(username: &str, password: &str) -> Result<login::LoginResult, error::Error> {
-    let url = "http://api.planets.nu/login";
-    let data = format!("username={0}&password={1}", username, password);
-    let json = try!(get_json(url, Some(data)));
-    parse::login(json.as_slice())
+    let url = format!("http://api.planets.nu/login?username={0}&password={1}", username, password);
+    let response = try!(http_get(url.as_slice()));
+    parse::login(try!(bytes_to_str(response.get_body())))
 }
 
 /*

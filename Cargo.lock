@@ -2,9 +2,15 @@
 name = "planets_nu"
 version = "0.0.1"
 dependencies = [
- "flate2 0.0.1 (git+https://github.com/alexcrichton/flate2-rs#68971ae77a523c7ec3f19b4bcd195f76291ea390)",
- "http 0.1.0-pre (git+https://github.com/chris-morgan/rust-http.git#ba43e05a5abdcc62b4a04b6a7fd6c634a8a4605a)",
- "url 0.1.0 (git+https://github.com/servo/rust-url.git#55b18b796ef2cef5490069dd450c60c2cc2c0c1b)",
+ "curl 0.0.1 (git+https://github.com/carllerche/curl-rust#4fd00ca19445304237d5cb0b19b8aa48393fac4f)",
+]
+
+[[package]]
+name = "curl"
+version = "0.0.1"
+source = "git+https://github.com/carllerche/curl-rust#4fd00ca19445304237d5cb0b19b8aa48393fac4f"
+dependencies = [
+ "url 0.1.0 (git+https://github.com/servo/rust-url#55b18b796ef2cef5490069dd450c60c2cc2c0c1b)",
 ]
 
 [[package]]
@@ -13,28 +19,9 @@ version = "0.1.0"
 source = "git+https://github.com/lifthrasiir/rust-encoding#4368ee5d0e7599964d98f874df22c86f4005c9ae"
 
 [[package]]
-name = "flate2"
-version = "0.0.1"
-source = "git+https://github.com/alexcrichton/flate2-rs#68971ae77a523c7ec3f19b4bcd195f76291ea390"
-
-[[package]]
-name = "http"
-version = "0.1.0-pre"
-source = "git+https://github.com/chris-morgan/rust-http.git#ba43e05a5abdcc62b4a04b6a7fd6c634a8a4605a"
-dependencies = [
- "openssl 0.0.0 (git+https://github.com/sfackler/rust-openssl.git#6277635e5c579c5842fc5f921a3b27a544a7b346)",
- "url 0.1.0 (git+https://github.com/servo/rust-url.git#55b18b796ef2cef5490069dd450c60c2cc2c0c1b)",
-]
-
-[[package]]
-name = "openssl"
-version = "0.0.0"
-source = "git+https://github.com/sfackler/rust-openssl.git#6277635e5c579c5842fc5f921a3b27a544a7b346"
-
-[[package]]
 name = "url"
 version = "0.1.0"
-source = "git+https://github.com/servo/rust-url.git#55b18b796ef2cef5490069dd450c60c2cc2c0c1b"
+source = "git+https://github.com/servo/rust-url#55b18b796ef2cef5490069dd450c60c2cc2c0c1b"
 dependencies = [
  "encoding 0.1.0 (git+https://github.com/lifthrasiir/rust-encoding#4368ee5d0e7599964d98f874df22c86f4005c9ae)",
 ]
