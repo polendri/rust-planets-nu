@@ -1,49 +1,33 @@
-extern crate serialize;
-
-use self::serialize::json;
-use std::collections;
-
-use common;
+/*!
+Functions to make requests against the planets.nu API.
+*/
 use curl;
-use login;
-pub use login::LoginResult;
+use error;
+use builders::login;
+pub use builders::login::LoginResult;
+use parse;
 
-fn check_success(map: &collections::TreeMap<String, json::Json>) -> Option<common::Error> {
-    let success_value = match (*map).find(&"success".to_string()) {
-        Some(x) => x,
-        None => return Some(common::Error::new(common::PlanetsNuError, "Could not find the 'success' key in the response.".to_string())),
+/// Performs an HTTP GET or POST as appropriate, and returns
+/// the resulting JSON (or an error if it fails).
+fn get_json(url: &str, data: Option<String>) -> Result<String, error::Error> {
+    let result = match data {
+        Some(data) => curl::http_post(url, data.as_slice()),
+        None => curl::http_get(url),
     };
-    let success = match *success_value {
-        json::Boolean(x) => x,
-        _ => return Some(common::Error::new(common::PlanetsNuError, "Unexpected (non-boolean) value found for 'success' key.".to_string())),
-    };
-    match success {
-        true => None,
-        false => {
-            let unknown_err = common::Error::new(common::PlanetsNuError, "Response indicates that the request failed (reason unknown).".to_string());
-            let error_value = match (*map).find(&"error".to_string()) {
-                Some(x) => x,
-                None => return Some(unknown_err),
-            };
-            match *error_value {
-                json::String(ref x) => Some(common::Error::new(common::PlanetsNuError, x.clone())),
-                _ => return Some(unknown_err),
-            }
-        },
-    }
+    let mut reader = try!(result.map_err(
+        |x| error::Error::new(error::NetworkError, x.desc.to_string())));
+    reader.read_to_string().map_err(
+        |x| error::Error::new(error::NetworkError, x.desc.to_string()))
 }
 
-pub fn login(username: String, password: String) -> Result<login::LoginResult, common::Error> {
+/// Make a call to the login API.
+///
+/// TODO: Way more documentation; code examples.
+pub fn login(username: &str, password: &str) -> Result<login::LoginResult, error::Error> {
     let url = "http://api.planets.nu/login";
     let data = format!("username={0}&password={1}", username, password);
-    let mut reader = try!(curl::http_post(url, data.as_slice()).map_err(|x| common::Error::new(common::NetworkError, x.desc.to_string())));
-    let json = try!(reader.read_to_string().map_err(|x| common::Error::new(common::NetworkError, x.desc.to_string())));
-    let map = try!(common::json_to_map(json.as_slice()));
-    match check_success(&map) {
-        Some(err) => return Err(err),
-        None => (),
-    };
-    login::read(&try!(common::json_to_map(json.as_slice())))
+    let json = try!(get_json(url, Some(data)));
+    parse::login(json.as_slice())
 }
 
 /*

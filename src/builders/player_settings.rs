@@ -1,3 +1,6 @@
+/*!
+Structs and functions for reading player settings data.
+*/
 extern crate serialize;
 
 use self::serialize::json;
@@ -5,7 +8,9 @@ use std::collections;
 
 use common;
 use common::RGB;
+use error;
 
+/// Represents the player settings data structure.
 #[deriving(Eq, PartialEq, Show)]
 pub struct PlayerSettings {
     pub player_planet_colors: (RGB, RGB),
@@ -32,7 +37,8 @@ pub struct PlayerSettings {
     */
 }
 
-pub fn read(map: &collections::TreeMap<String, json::Json>) -> Result<PlayerSettings, common::Error> {
+/// Builds a player settings struct given a JSON object map.
+pub fn build(map: &collections::TreeMap<String, json::Json>) -> Result<PlayerSettings, error::Error> {
     Ok(PlayerSettings {
         player_planet_colors: (
             try!(common::to_rgb(match_json_string!(map, "myplanetfrom").as_slice())),
@@ -41,7 +47,7 @@ pub fn read(map: &collections::TreeMap<String, json::Json>) -> Result<PlayerSett
 }
 
 #[test]
-fn test_read() {
+fn test_build() {
     let json = "{\
         \"myplanetfrom\" : \"#ccffff\",\
         \"myplanetto\" : \"#00ffff\"\
@@ -51,5 +57,5 @@ fn test_read() {
             RGB { red: 204u8, green: 255u8, blue: 255u8 },
             RGB { red: 0u8, green: 255u8, blue: 255u8 }),
     };
-    assert_eq!(result, read(&common::json_to_map(json).unwrap()).unwrap());
+    assert_eq!(result, build(&common::json_to_map(json).unwrap()).unwrap());
 }

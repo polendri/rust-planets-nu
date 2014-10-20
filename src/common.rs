@@ -1,27 +1,15 @@
+/*!
+Contains data structures and helper methods useful
+to many components of the library.
+*/
+
 extern crate serialize;
 
 use self::serialize::json;
 use std::char;
 use std::collections;
 
-#[deriving(Eq, PartialEq, Show)]
-pub enum ErrorKind {
-    LibError,
-    NetworkError,
-    PlanetsNuError,
-}
-
-#[deriving(Eq, PartialEq, Show)]
-pub struct Error {
-    pub kind: ErrorKind,
-    pub desc: String,
-}
-
-impl Error {
-    pub fn new(kind: ErrorKind, desc: String) -> Error {
-        Error { kind: kind, desc: desc }
-    }
-}
+use error;
 
 #[deriving(Eq, PartialEq, Show)]
 pub struct RGB {
@@ -30,8 +18,9 @@ pub struct RGB {
     pub blue: u8,
 }
 
-pub fn to_rgb(rgb_str: &str) -> Result<RGB, Error> {
-    let str_to_err = |string| { Error::new(LibError, string) };
+/// Converts a string of the form "#XXXXXX" (where X is a hex digit) to an RGB object.
+pub fn to_rgb(rgb_str: &str) -> Result<RGB, error::Error> {
+    let str_to_err = |string| { error::Error::new(error::LibError, string) };
     let short_err = str_to_err("RGB string is too short.".to_string());
     let long_err = str_to_err("RGB string is too long.".to_string());
     let digit_err = str_to_err("Encountered a non-hex digit.".to_string());
@@ -52,21 +41,21 @@ pub fn to_rgb(rgb_str: &str) -> Result<RGB, Error> {
     Ok(RGB { red: r, green: g, blue: b })
 }
 
-pub fn json_to_map(json: &str) -> Result<collections::TreeMap<String, json::Json>, Error> {
+/// Converts a string which encodes a JSON object into a TreeMap representing that object.
+pub fn json_to_map(json: &str) -> Result<collections::TreeMap<String, json::Json>, error::Error> {
     let root_enum = match json::from_str(json) {
         Ok(x) => x,
-        Err(error) => return Err(Error::new(PlanetsNuError, format!("Error while decoding the login response: {}", error))),
+        Err(error) => return Err(error::Error::new(error::PlanetsNuError, format!("Error while decoding the login response: {}", error))),
     };
-    Ok(try_match!(root_enum, json::Object(x) => x, Error::new(PlanetsNuError, "Could not find root of login response".to_string())))
+    Ok(try_match!(root_enum, json::Object(x) => x, error::Error::new(error::PlanetsNuError, "Could not find root of login response".to_string())))
 }
 
 #[test]
 fn test_to_rgb_errors() {
-    assert_eq!(LibError, to_rgb("#af320").unwrap_err().kind);
-    //assert_eq!("RGB string is too short.", to_rgb("#af320").unwrap_err().as_slice());
-    //assert_eq!("RGB string is too long.", to_rgb("#af32013").unwrap_err().as_slice());
-    //assert_eq!("Encountered a non-hex digit.", to_rgb("#ag03a3").unwrap_err().as_slice());
-    //assert_eq!("Could not find leading '#'.", to_rgb("1234567").unwrap_err().as_slice());
+    assert_eq!(error::LibError, to_rgb("#af320").unwrap_err().kind);   // too short
+    assert_eq!(error::LibError, to_rgb("#af32021").unwrap_err().kind); // too long
+    assert_eq!(error::LibError, to_rgb("#ag03a3").unwrap_err().kind);  // non-hex digit
+    assert_eq!(error::LibError, to_rgb("1234567").unwrap_err().kind);  // no leading '#'
 }
 
 #[test]

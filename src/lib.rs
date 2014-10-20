@@ -12,7 +12,7 @@ macro_rules! try_match(
 )
 
 macro_rules! find_match(
-    ($i:ident, $e1:expr, $p:pat => $e2:expr) => (try_match!(*expect!($i.find(&$e1.to_string()), common::Error::new(common::LibError, format!("Could not find key '{}'.", $e1))), $p => $e2, common::Error::new(common::LibError, format!("Unexpected type for key '{}'.", $e1))))
+    ($i:ident, $e1:expr, $p:pat => $e2:expr) => (try_match!(*expect!($i.find(&$e1.to_string()), error::Error::new(error::LibError, format!("Could not find key '{}'.", $e1))), $p => $e2, error::Error::new(error::LibError, format!("Unexpected type for key '{}'.", $e1))))
 )
 
 macro_rules! match_json_object(
@@ -27,9 +27,10 @@ macro_rules! match_json_string(
     ($i:ident, $e:expr) => (find_match!($i, $e, json::String(ref x) => x.clone()))
 )
 
+pub mod error;
+pub mod parse;
 pub mod request;
 
+mod builders;
 mod common;
 mod curl;
-mod login;
-mod player_settings;
