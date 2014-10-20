@@ -1,11 +1,9 @@
 [package]
-
 name = "planets_nu"
 version = "0.0.1"
 authors = ["Paul Hendry <paul@pshendry.com>"]
 
 [lib]
-
 name = "planets_nu"
 path = "src/lib.rs"
 

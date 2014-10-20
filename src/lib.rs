@@ -1,3 +1,6 @@
+#![crate_name="planets_nu"]
+#![crate_type="rlib"]
+
 #![feature(macro_rules)]
 
 macro_rules! expect(
@@ -24,7 +27,7 @@ macro_rules! match_json_string(
     ($i:ident, $e:expr) => (find_match!($i, $e, json::String(ref x) => x.clone()))
 )
 
-pub mod planets_nu;
+pub mod request;
 
 mod common;
 mod curl;

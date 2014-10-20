@@ -35,7 +35,6 @@ fn check_success(map: &collections::TreeMap<String, json::Json>) -> Option<commo
 
 pub fn login(username: String, password: String) -> Result<login::LoginResult, common::Error> {
     let url = "http://api.planets.nu/login";
-    //let url = "http://api.planets.nu/login?username=rainbow%20stalin&password=qmb1337acusphail";
     let data = format!("username={0}&password={1}", username, password);
     let mut reader = try!(curl::http_post(url, data.as_slice()).map_err(|x| common::Error::new(common::NetworkError, x.desc.to_string())));
     let json = try!(reader.read_to_string().map_err(|x| common::Error::new(common::NetworkError, x.desc.to_string())));

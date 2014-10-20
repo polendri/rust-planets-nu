@@ -13,8 +13,8 @@ pub enum ErrorKind {
 
 #[deriving(Eq, PartialEq, Show)]
 pub struct Error {
-    kind: ErrorKind,
-    desc: String,
+    pub kind: ErrorKind,
+    pub desc: String,
 }
 
 impl Error {
