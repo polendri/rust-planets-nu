@@ -1,8 +1,11 @@
+language: rust
 env:
   global:
-    - secure: Jd6w+PlCId8c/i/vHQBYkuxD/fccTPjO2JbyyeVgQXCOYugQluk9cPxBndZ7VSU0jvrI8r2ISedChxudNwF+Oa0yTaig6dnh1SNvX3knvO4fb7KDpPjwP5sgIjaMRxwZt9gQjRC8Rd+hNfIjF+5HZCjaSQHnkStUkMvO65c9y8c=
-
-language: rust
-
+    - secure: ApKDsP2crjZAiH2nvoQRRJgSQeyELTzDArumtRoe/ksHzwH8pQ6xRbcnK2KxMxt1S3uXrwFWGbLT1qcnesABG051EYjLjKfD79Rv9Td+Ffbpb4T5JSEcEz4F/MeckU8Gn6phvbMWBqwDRAxsq/bxOHzX7HMyEJwVv7Mi6EmfNwI=
+script:
+- cargo build -v
+- cargo test -v
+- cargo doc --no-deps -v
+- mv target/doc doc
 after_script:
   - curl http://www.rust-ci.org/artifacts/put?t=$RUSTCI_TOKEN | sh
