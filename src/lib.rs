@@ -24,6 +24,10 @@ macro_rules! match_json_bool(
     ($i:ident, $e:expr) => (find_match!($i, $e, json::Boolean(x) => x))
 )
 
+macro_rules! match_json_i64(
+    ($i:ident, $e:expr) => (find_match!($i, $e, json::I64(x) => x))
+)
+
 macro_rules! match_json_string(
     ($i:ident, $e:expr) => (find_match!($i, $e, json::String(ref x) => x.clone()))
 )
@@ -34,3 +38,4 @@ pub mod request;
 
 mod builders;
 mod common;
+mod json_helpers;

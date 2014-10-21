@@ -8,6 +8,7 @@ use self::planets_nu::request;
 use std::fmt;
 
 /// Given a request, prints out a message indicating its success or failure.
+#[allow(dead_code)]
 fn print_result<T: fmt::Show>(name: &str, result: Result<T, error::Error>) {
     print!("Running test for '{}' call... ", name);
     match result {
@@ -16,6 +17,7 @@ fn print_result<T: fmt::Show>(name: &str, result: Result<T, error::Error>) {
     };
 }
 
+#[allow(dead_code)]
 fn main() {
     println!("Online test run has begun.\n");
 

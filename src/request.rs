@@ -21,6 +21,7 @@ fn http_get(url: &str) -> Result<http::Response, error::Error> {
     }
 }
 
+/*
 /// Performs an HTTP POST request, returning the response (or an error).
 fn http_post(url: &str, data: &str) -> Result<http::Response, error::Error> {
     match http::handle().post(url, data).exec() {
@@ -30,6 +31,7 @@ fn http_post(url: &str, data: &str) -> Result<http::Response, error::Error> {
             format!("curl POST request failed with error code {}", code))),
     }
 }
+*/
 
 fn bytes_to_str<'a>(bytes: &'a [u8]) -> Result<&'a str, error::Error> {
     match str::from_utf8(bytes) {
