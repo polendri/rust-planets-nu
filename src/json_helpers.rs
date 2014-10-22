@@ -6,6 +6,7 @@ extern crate serialize;
 
 use self::serialize::json;
 use std::collections;
+use std::f64;
 
 use error;
 
@@ -16,6 +17,24 @@ fn find_key<'a>(map: &'a collections::TreeMap<String, json::Json>, key: String) 
         None => Err(error::Error::new(
             error::LibError,
             format!("Could not find key '{}'.", key))),
+    }
+}
+
+pub fn find_object<'a>(map: &'a collections::TreeMap<String, json::Json>, key: &str) -> Result<&'a collections::TreeMap<String, json::Json>, error::Error> {
+    match *try!(find_key(map, key.to_string())) {
+        json::Object(ref x) => Ok(x),
+        _ => Err(error::Error::new(
+            error::LibError,
+            format!("Expected object type for key '{}' but found something else.", key))),
+    }
+}
+
+pub fn find_list<'a>(map: &'a collections::TreeMap<String, json::Json>, key: &str) -> Result<&'a Vec<json::Json>, error::Error> {
+    match *try!(find_key(map, key.to_string())) {
+        json::List(ref x) => Ok(x),
+        _ => Err(error::Error::new(
+            error::LibError,
+            format!("Expected list type for key '{}' but found something else.", key))),
     }
 }
 
@@ -42,6 +61,15 @@ pub fn find_i64(map: &collections::TreeMap<String, json::Json>, key: &str) -> Re
         _ => Err(error::Error::new(
             error::LibError,
             format!("Expected int type for key '{}' but found something else.", key))),
+    }
+}
+
+pub fn find_float(map: &collections::TreeMap<String, json::Json>, key: &str) -> Result<String, error::Error> {
+    match *try!(find_key(map, key.to_string())) {
+        json::F64(x) => Ok(f64::to_str_digits(x, 15)),
+        _ => Err(error::Error::new(
+            error::LibError,
+            format!("Expected float type for key '{}' but found something else.", key))),
     }
 }
 

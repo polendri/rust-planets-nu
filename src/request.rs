@@ -52,6 +52,26 @@ pub fn login(username: &str, password: &str) -> Result<login::LoginResult, error
 }
 
 /*
+/// Make a call to the games list API.
+///
+/// TODO: Way more documentation; code examples.
+/// TODO: params should have their own structs
+pub fn list_games(status: Option<i64>,
+                  game_type: Option<i64>,
+                  scope: Option<i64>,
+                  ids: Option<&str>,
+                  username: Option<&str>,
+                  limit: Option<i64>) -> Result<login::LoginResult, error::Error> {
+    let mut url = "http://api.planets.nu/games/list".to_string();
+
+    if status.is_some() || game_type.is_some() || scope.is_some() || ids.is_some() || username.is_some() || limit.is_some()
+    ?username={0}&password={1}", username, password);
+    let response = try!(http_get(url.as_slice()));
+    parse::login(try!(bytes_to_str(response.get_body())))
+}
+*/
+
+/*
 pub fn game_info_json(game_id: i64) -> Result<String, String> {
     let url = "http://api.planets.nu/game/loadinfo?gameid=".to_string() + game_id.to_string();
 */

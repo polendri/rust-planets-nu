@@ -44,10 +44,19 @@ pub fn to_rgb(rgb_str: &str) -> Result<RGB, error::Error> {
 /// Converts a string which encodes a JSON object into a TreeMap representing that object.
 pub fn json_to_map(json: &str) -> Result<collections::TreeMap<String, json::Json>, error::Error> {
     let root_enum = match json::from_str(json) {
-        Ok(x) => x,
-        Err(error) => return Err(error::Error::new(error::PlanetsNuError, format!("Error while decoding the login response: {}", error))),
+        Ok(x) => x, //TODO: inefficient; reference?
+        Err(error) => return Err(error::Error::new(error::PlanetsNuError, format!("Error while decoding JSON: {}", error))),
     };
-    Ok(try_match!(root_enum, json::Object(x) => x, error::Error::new(error::PlanetsNuError, "Could not find root of login response".to_string())))
+    Ok(try_match!(root_enum, json::Object(x) => x, error::Error::new(error::PlanetsNuError, "Input JSON does not represent an object".to_string())))
+}
+
+/// Converts a string which encodes a JSON list into a Vec representing that list.
+pub fn json_to_list(json: &str) -> Result<Vec<json::Json>, error::Error> {
+    let root_enum = match json::from_str(json) {
+        Ok(x) => x, //TODO: inefficient; reference?
+        Err(error) => return Err(error::Error::new(error::PlanetsNuError, format!("Error while decoding JSON: {}", error))),
+    };
+    Ok(try_match!(root_enum, json::List(x) => x, error::Error::new(error::PlanetsNuError, "Input JSON does not represent a list".to_string())))
 }
 
 #[test]

@@ -6,13 +6,14 @@ extern crate serialize;
 use self::serialize::json;
 use std::collections;
 
+use builders::player_settings;
+use builders::player_settings::PlayerSettings;
 #[allow(unused_imports)] // common is used for testing
 use common;
 #[allow(unused_imports)] // RGB is used for testing
 use common::RGB;
 use error;
-use builders::player_settings;
-use builders::player_settings::PlayerSettings;
+use json_helpers;
 
 /// Represents the login result data structure.
 #[deriving(Eq, PartialEq, Show)]
@@ -24,8 +25,8 @@ pub struct LoginResult {
 /// Builds a login result struct given a JSON object map.
 pub fn build(map: &collections::TreeMap<String, json::Json>) -> Result<LoginResult, error::Error> {
     Ok(LoginResult {
-        api_key: match_json_string!(map, "apikey"),
-        player_settings: try!(player_settings::build(match_json_object!(map, "settings"))),
+        api_key: try!(json_helpers::find_string(map, "apikey")),
+        player_settings: try!(player_settings::build(try!(json_helpers::find_object(map, "settings")))),
     })
 }
 
