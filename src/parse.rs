@@ -1,12 +1,9 @@
 /*!
 Functions used to interpret planets.nu API responses directly from JSON.
 */
-use std::collections;
-
 use builders::game;
 use builders::list_games;
 use builders::login;
-pub use builders::login::LoginResult;
 use error;
 use json_helpers::parse;
 

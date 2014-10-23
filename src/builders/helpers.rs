@@ -1,6 +1,5 @@
 /*!
-Contains data structures and helper methods useful
-to many components of the library.
+Contains data structures and helper methods useful to builder modules.
 */
 extern crate serialize;
 
@@ -10,6 +9,9 @@ use std::collections;
 
 use error;
 
+// Public
+
+/// Represents a 3-byte RGB colour value.
 #[deriving(Eq, PartialEq, Show)]
 pub struct RGB {
     pub red: u8,
@@ -81,15 +83,44 @@ pub fn check_success(map: &collections::TreeMap<String, json::Json>) -> Result<(
     }
 }
 
-#[test]
-fn test_to_rgb_errors() {
-    assert_eq!(error::LibError, to_rgb("#af320").unwrap_err().kind);   // too short
-    assert_eq!(error::LibError, to_rgb("#af32021").unwrap_err().kind); // too long
-    assert_eq!(error::LibError, to_rgb("#ag03a3").unwrap_err().kind);  // non-hex digit
-    assert_eq!(error::LibError, to_rgb("1234567").unwrap_err().kind);  // no leading '#'
-}
+// Tests
 
-#[test]
-fn test_to_rgb() {
-    assert_eq!(RGB { red: 175u8, green: 50u8, blue: 8u8 }, to_rgb("#af3208").unwrap());
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use super::serialize::json;
+    use std::collections;
+    use error;
+
+    #[test]
+    fn test_to_rgb_errors() {
+        assert_eq!(error::LibError, to_rgb("#af320").unwrap_err().kind);   // too short
+        assert_eq!(error::LibError, to_rgb("#af32021").unwrap_err().kind); // too long
+        assert_eq!(error::LibError, to_rgb("#ag03a3").unwrap_err().kind);  // non-hex digit
+        assert_eq!(error::LibError, to_rgb("1234567").unwrap_err().kind);  // no leading '#'
+    }
+
+    #[test]
+    fn test_to_rgb() {
+        assert_eq!(RGB { red: 175u8, green: 50u8, blue: 8u8 }, to_rgb("#af3208").unwrap());
+    }
+
+    #[test]
+    fn test_check_success_errors() {
+        let mut map = collections::TreeMap::new();
+        assert_eq!(error::PlanetsNuError, check_success(&map).unwrap_err().kind); // no "success" key
+        map.insert("success".to_string(), json::I64(1337i64));
+        assert_eq!(error::PlanetsNuError, check_success(&map).unwrap_err().kind); // wrong type for "success" key
+        map.insert("success".to_string(), json::Boolean(false));
+        assert_eq!(error::PlanetsNuError, check_success(&map).unwrap_err().kind); // request failed, unknown reason
+        map.insert("error".to_string(), json::String("heh".to_string()));
+        assert_eq!(error::PlanetsNuError, check_success(&map).unwrap_err().kind); // request failed, known reason
+    }
+
+    #[test]
+    fn test_check_success() {
+        let mut map = collections::TreeMap::new();
+        map.insert("success".to_string(), json::Boolean(true));
+        assert_eq!((), check_success(&map).unwrap());
+    }
 }

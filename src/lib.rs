@@ -2,6 +2,7 @@
 #![crate_type="rlib"]
 #![doc(html_root_url = "http://www.rust-ci.org/pshendry/rust-planets-nu/doc/planets_nu/")]
 
+#![feature(globs)]
 #![feature(macro_rules)]
 
 macro_rules! expect(

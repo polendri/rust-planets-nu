@@ -14,6 +14,7 @@ fn mk_lib_err<T>(msg: String) -> Result<T, error::Error> {
     Err(error::Error::new(error::LibError, msg))
 }
 
+/// Parses a JSON string and returns the root item, or else an error.
 pub fn parse(json: &str) -> Result<json::Json, error::Error> {
     match json::from_str(json) {
         Ok(x) => Ok(x),
@@ -23,7 +24,7 @@ pub fn parse(json: &str) -> Result<json::Json, error::Error> {
     }
 }
 
-/// Find a key in the map, or else return an error.
+/// Finds a key in the map, or else returns an error.
 pub fn find<'a>(map: &'a collections::TreeMap<String, json::Json>, key: &str) -> Result<&'a json::Json, error::Error> {
     match (*map).find(&key.to_string()) {
         Some(x) => Ok(x),
@@ -31,6 +32,7 @@ pub fn find<'a>(map: &'a collections::TreeMap<String, json::Json>, key: &str) ->
     }
 }
 
+/// Gets the value of a JSON object, returning an error if it is not an object.
 pub fn get_object<'a>(json_enum: &'a json::Json) -> Result<&'a collections::TreeMap<String, json::Json>, error::Error> {
     match *json_enum {
         json::Object(ref x) => Ok(x),
@@ -38,6 +40,7 @@ pub fn get_object<'a>(json_enum: &'a json::Json) -> Result<&'a collections::Tree
     }
 }
 
+/// Gets the value of a JSON list, returning an error if it is not a list.
 pub fn get_list<'a>(json_enum: &'a json::Json) -> Result<&'a Vec<json::Json>, error::Error> {
     match *json_enum {
         json::List(ref x) => Ok(x),
@@ -45,6 +48,7 @@ pub fn get_list<'a>(json_enum: &'a json::Json) -> Result<&'a Vec<json::Json>, er
     }
 }
 
+/// Gets the value of a JSON boolean, returning an error if it is not a boolean.
 pub fn get_bool<'a>(json_enum: &'a json::Json) -> Result<bool, error::Error> {
     match *json_enum {
         json::Boolean(x) => Ok(x),
@@ -57,6 +61,7 @@ pub fn get_bool<'a>(json_enum: &'a json::Json) -> Result<bool, error::Error> {
     }
 }
 
+/// Gets the value of a JSON integer, returning an error if it is not an integer.
 pub fn get_i64<'a>(json_enum: &'a json::Json) -> Result<i64, error::Error> {
     match *json_enum {
         json::I64(x) => Ok(x),
@@ -65,6 +70,10 @@ pub fn get_i64<'a>(json_enum: &'a json::Json) -> Result<i64, error::Error> {
     }
 }
 
+/// Gets the value of a JSON float, returning an error if it is not a float.
+///
+/// Note: returns the result as a String to ensure exact representation,
+/// because Rust does not appear to have a decimal type that is easy to use.
 pub fn get_float<'a>(json_enum: &'a json::Json) -> Result<String, error::Error> {
     match *json_enum {
         json::F64(x) => Ok(f64::to_str_digits(x, 15)),
@@ -72,6 +81,7 @@ pub fn get_float<'a>(json_enum: &'a json::Json) -> Result<String, error::Error> 
     }
 }
 
+/// Gets the value of a JSON string, returning an error if it is not a string.
 pub fn get_string<'a>(json_enum: &'a json::Json) -> Result<String, error::Error> {
     match *json_enum {
         json::String(ref x) => Ok(x.clone()),
@@ -81,11 +91,15 @@ pub fn get_string<'a>(json_enum: &'a json::Json) -> Result<String, error::Error>
 
 // TODO: tests
 /*
-#[test]
-fn test_json_to_map() {
-    let input = "{ \"key1\" : true, \"key2\" : \"value\" }";
-    let map = json_to_map(input).unwrap();
-    assert_eq!(json::Boolean(true), *map.find(&"key1".to_string()).unwrap());
-    assert_eq!(json::String("value".to_string()), *map.find(&"key2".to_string()).unwrap());
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_json_to_map() {
+        let input = "{ \"key1\" : true, \"key2\" : \"value\" }";
+        let map = json_to_map(input).unwrap();
+        assert_eq!(json::Boolean(true), *map.find(&"key1".to_string()).unwrap());
+        assert_eq!(json::String("value".to_string()), *map.find(&"key2".to_string()).unwrap());
+    }
 }
 */
