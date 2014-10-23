@@ -7,7 +7,6 @@ use builders::game;
 use builders::list_games;
 use builders::login;
 pub use builders::login::LoginResult;
-use common;
 use error;
 use json_helpers::parse;
 

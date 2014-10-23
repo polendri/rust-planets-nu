@@ -13,5 +13,4 @@ pub mod parse;
 pub mod request;
 
 mod builders;
-mod common;
 mod json_helpers;

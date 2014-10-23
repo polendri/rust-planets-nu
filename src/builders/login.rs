@@ -3,12 +3,12 @@ extern crate serialize;
 use self::serialize::json;
 use std::collections;
 
+#[allow(unused_imports)] // helpers is used for testing
+use builders::helpers;
+#[allow(unused_imports)] // RGB is used for testing
+use builders::helpers::RGB;
 use builders::player_settings;
 use builders::player_settings::PlayerSettings;
-#[allow(unused_imports)] // common is used for testing
-use common;
-#[allow(unused_imports)] // RGB is used for testing
-use common::RGB;
 use error;
 use json_helpers::find;
 use json_helpers::get_bool;
@@ -28,7 +28,7 @@ pub struct LoginResult {
 /// Builds a login result struct given a JSON object.
 pub fn build(json: &json::Json) -> Result<LoginResult, error::Error> {
     let map = try!(get_object(json));
-    try!(common::check_success(map));
+    try!(helpers::check_success(map));
     Ok(LoginResult {
         api_key: try!(get_string(try!(find(map, "apikey")))),
         player_settings: try!(player_settings::build(try!(find(map, "settings")))),
