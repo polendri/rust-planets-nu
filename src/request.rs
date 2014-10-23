@@ -7,9 +7,12 @@ use self::curl::http;
 use std::str;
 
 use error;
+use builders::list_games;
 use builders::login;
-pub use builders::login::LoginResult;
 use parse;
+
+pub use builders::game::Game;
+pub use builders::login::LoginResult;
 
 /// Performs an HTTP GET request, returning the response (or an error).
 fn http_get(url: &str) -> Result<http::Response, error::Error> {
@@ -51,27 +54,27 @@ pub fn login(username: &str, password: &str) -> Result<login::LoginResult, error
     parse::login(try!(bytes_to_str(response.get_body())))
 }
 
-/*
 /// Make a call to the games list API.
 ///
 /// TODO: Way more documentation; code examples.
 /// TODO: params should have their own structs
-pub fn list_games(status: Option<i64>,
-                  game_type: Option<i64>,
-                  scope: Option<i64>,
+pub fn list_games(status: Option<&str>,
+                  game_type: Option<&str>,
+                  scope: Option<&str>,
                   ids: Option<&str>,
                   username: Option<&str>,
-                  limit: Option<i64>) -> Result<login::LoginResult, error::Error> {
+                  limit: Option<i64>) -> Result<Vec<Game>, error::Error> {
     let mut url = "http://api.planets.nu/games/list".to_string();
+    let mut prepend_char = "?".to_string();
 
-    if status.is_some() || game_type.is_some() || scope.is_some() || ids.is_some() || username.is_some() || limit.is_some()
-    ?username={0}&password={1}", username, password);
+    match status {
+        Some(s) => {
+            url = url + prepend_char + "status=" + s.to_string();
+            prepend_char = "&".to_string();
+        },
+        None => (),
+    };
+
     let response = try!(http_get(url.as_slice()));
-    parse::login(try!(bytes_to_str(response.get_body())))
+    parse::list_games(try!(bytes_to_str(response.get_body())))
 }
-*/
-
-/*
-pub fn game_info_json(game_id: i64) -> Result<String, String> {
-    let url = "http://api.planets.nu/game/loadinfo?gameid=".to_string() + game_id.to_string();
-*/

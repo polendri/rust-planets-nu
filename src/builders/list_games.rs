@@ -4,22 +4,17 @@ use self::serialize::json;
 
 use builders::game;
 use builders::game::Game;
-use common;
 use error;
-use json_helpers;
+use json_helpers::get_list;
+use json_helpers::parse;
 
 /// Builds a game struct given a JSON object map.
-pub fn build(vec: &Vec<json::Json>) -> Result<Vec<Game>, error::Error> {
-    let mut results: Vec<Game> = Vec::with_capacity(vec.len());
+pub fn build(json: &json::Json) -> Result<Vec<Game>, error::Error> {
+    let game_list = try!(get_list(json));
+    let mut results: Vec<Game> = Vec::with_capacity(game_list.len());
 
-    for game in vec.iter() {
-        let map = match *game {
-            json::Object(ref x) => x,
-            _ => return Err(error::Error::new(
-                error::LibError,
-                "Expected object type in list but found something else.".to_string())),
-        };
-        results.push(try!(game::build(map)));
+    for game in game_list.iter() {
+        results.push(try!(game::build(game)));
     }
     Ok(results)
 }
@@ -117,7 +112,7 @@ fn test_build() {
         id: 25164i64,
     };
 
-    let results: Vec<Game> = build(&common::json_to_list(json).unwrap()).unwrap();
+    let results: Vec<Game> = build(&parse(json).unwrap()).unwrap();
     assert_eq!(1, results.len());
-    //assert_eq!(expected, results[0]);
+    assert_eq!(expected, results[0]);
 }

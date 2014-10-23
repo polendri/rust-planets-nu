@@ -2,7 +2,6 @@
 Contains data structures and helper methods useful
 to many components of the library.
 */
-
 extern crate serialize;
 
 use self::serialize::json;
@@ -41,22 +40,42 @@ pub fn to_rgb(rgb_str: &str) -> Result<RGB, error::Error> {
     Ok(RGB { red: r, green: g, blue: b })
 }
 
-/// Converts a string which encodes a JSON object into a TreeMap representing that object.
-pub fn json_to_map(json: &str) -> Result<collections::TreeMap<String, json::Json>, error::Error> {
-    let root_enum = match json::from_str(json) {
-        Ok(x) => x, //TODO: inefficient; reference?
-        Err(error) => return Err(error::Error::new(error::PlanetsNuError, format!("Error while decoding JSON: {}", error))),
+/// Checks for the 'success' key in order to determine whether an API response
+/// indicates success or failure.
+pub fn check_success(map: &collections::TreeMap<String, json::Json>) -> Result<(), error::Error> {
+    let success_value = match (*map).find(&"success".to_string()) {
+        Some(x) => x,
+        None => return Err(
+            error::Error::new(
+                error::PlanetsNuError,
+                "Could not find the 'success' key in the response.".to_string())),
     };
-    Ok(try_match!(root_enum, json::Object(x) => x, error::Error::new(error::PlanetsNuError, "Input JSON does not represent an object".to_string())))
-}
-
-/// Converts a string which encodes a JSON list into a Vec representing that list.
-pub fn json_to_list(json: &str) -> Result<Vec<json::Json>, error::Error> {
-    let root_enum = match json::from_str(json) {
-        Ok(x) => x, //TODO: inefficient; reference?
-        Err(error) => return Err(error::Error::new(error::PlanetsNuError, format!("Error while decoding JSON: {}", error))),
+    let success = match *success_value {
+        json::Boolean(x) => x,
+        _ => return Err(
+            error::Error::new(
+                error::PlanetsNuError,
+                "Unexpected (non-boolean) value found for 'success' key.".to_string())),
     };
-    Ok(try_match!(root_enum, json::List(x) => x, error::Error::new(error::PlanetsNuError, "Input JSON does not represent a list".to_string())))
+    match success {
+        true => Ok(()),
+        false => {
+            let unknown_err = error::Error::new(
+                error::PlanetsNuError,
+                "Response indicates that the request failed (reason unknown).".to_string());
+            let error_value = match (*map).find(&"error".to_string()) {
+                Some(x) => x,
+                None => return Err(unknown_err),
+            };
+            match *error_value {
+                json::String(ref x) => Err(
+                    error::Error::new(
+                        error::PlanetsNuError,
+                        x.clone())),
+                _ => return Err(unknown_err),
+            }
+        },
+    }
 }
 
 #[test]
@@ -70,12 +89,4 @@ fn test_to_rgb_errors() {
 #[test]
 fn test_to_rgb() {
     assert_eq!(RGB { red: 175u8, green: 50u8, blue: 8u8 }, to_rgb("#af3208").unwrap());
-}
-
-#[test]
-fn test_json_to_map() {
-    let input = "{ \"key1\" : true, \"key2\" : \"value\" }";
-    let map = json_to_map(input).unwrap();
-    assert_eq!(json::Boolean(true), *map.find(&"key1".to_string()).unwrap());
-    assert_eq!(json::String("value".to_string()), *map.find(&"key2".to_string()).unwrap());
 }

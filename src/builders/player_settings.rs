@@ -9,7 +9,13 @@ use std::collections;
 use common;
 use common::RGB;
 use error;
-use json_helpers;
+use json_helpers::find;
+use json_helpers::get_bool;
+use json_helpers::get_float;
+use json_helpers::get_i64;
+use json_helpers::get_object;
+use json_helpers::get_string;
+use json_helpers::parse;
 
 /// Represents the player settings data structure.
 #[deriving(Eq, PartialEq, Show)]
@@ -36,63 +42,57 @@ pub struct PlayerSettings {
     pub id: i64,
 }
 
-/// Builds a player settings struct given a JSON object map.
-pub fn build(map: &collections::TreeMap<String, json::Json>) -> Result<PlayerSettings, error::Error> {
+pub fn build(json: &json::Json) -> Result<PlayerSettings, error::Error> {
+    let map = try!(get_object(json));
     Ok(PlayerSettings {
         player_planet_colors: (
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "myplanetfrom")).as_slice())),
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "myplanetto")).as_slice()))),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "myplanetfrom")))).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "myplanetto")))).as_slice()))),
         enemy_planet_colors: (
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "enemyplanetfrom")).as_slice())),
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "enemyplanetto")).as_slice()))),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "enemyplanetfrom")))).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "enemyplanetto")))).as_slice()))),
         ally_planet_colors: (
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "allyplanetfrom")).as_slice())),
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "allyplanetto")).as_slice()))),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "allyplanetfrom")))).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "allyplanetto")))).as_slice()))),
         info_planet_colors: (
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "infoplanetfrom")).as_slice())),
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "infoplanetto")).as_slice()))),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "infoplanetfrom")))).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "infoplanetto")))).as_slice()))),
         unknown_planet_colors: (
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "unknownplanetfrom")).as_slice())),
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "unknownplanetto")).as_slice()))),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "unknownplanetfrom")))).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "unknownplanetto")))).as_slice()))),
         player_ship_colors: (
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "myshipfrom")).as_slice())),
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "myshipto")).as_slice()))),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "myshipfrom")))).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "myshipto")))).as_slice()))),
         enemy_ship_colors: (
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "enemyshipfrom")).as_slice())),
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "enemyshipto")).as_slice()))),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "enemyshipfrom")))).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "enemyshipto")))).as_slice()))),
         ally_ship_colors: (
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "allyshipfrom")).as_slice())),
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "allyshipto")).as_slice()))),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "allyshipfrom")))).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "allyshipto")))).as_slice()))),
         player_mine_color:
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "mymines")).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "mymines")))).as_slice())),
         enemy_mine_color:
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "enemymines")).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "enemymines")))).as_slice())),
         web_mine_color:
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "webmines")).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "webmines")))).as_slice())),
         ally_mine_color:
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "allymines")).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "allymines")))).as_slice())),
         ion_storm_color:
-            try!(common::to_rgb(try!(json_helpers::find_string(map, "ionstorms")).as_slice())),
+            try!(common::to_rgb(try!(get_string(try!(find(map, "ionstorms")))).as_slice())),
         assistant_enabled:
-            try!(json_helpers::find_bool(map, "assistanton")),
+            try!(get_bool(try!(find(map, "assistanton")))),
         mouse_zoom_enabled:
-            try!(json_helpers::find_bool(map, "mousezoom")),
+            try!(get_bool(try!(find(map, "mousezoom")))),
         sound_effects_enabled:
-            match try!(json_helpers::find_string(map, "soundon")).as_slice() {
-                "true" => true,
-                _ => false,
-            },
+            try!(get_bool(try!(find(map, "soundon")))),
         music_enabled:
-            match try!(json_helpers::find_string(map, "musicon")).as_slice() {
-                "true" => true,
-                _ => false,
-            },
+            try!(get_bool(try!(find(map, "musicon")))),
         battle_task_id:
-            try!(json_helpers::find_i64(map, "battletaskid")),
+            try!(get_i64(try!(find(map, "battletaskid")))),
         battle_tutorial_id:
-            try!(json_helpers::find_i64(map, "battletutorialid")),
+            try!(get_i64(try!(find(map, "battletutorialid")))),
         id:
-            try!(json_helpers::find_i64(map, "id")),
+            try!(get_i64(try!(find(map, "id")))),
     })
 }
 
@@ -171,5 +171,5 @@ fn test_build() {
         battle_tutorial_id: 1,
         id: 0,
     };
-    assert_eq!(result, build(&common::json_to_map(json).unwrap()).unwrap());
+    assert_eq!(result, build(&parse(json).unwrap()).unwrap());
 }

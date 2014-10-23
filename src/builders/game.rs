@@ -1,11 +1,15 @@
 extern crate serialize;
 
 use self::serialize::json;
-use std::collections;
 
-use common;
 use error;
-use json_helpers;
+use json_helpers::find;
+use json_helpers::get_bool;
+use json_helpers::get_float;
+use json_helpers::get_i64;
+use json_helpers::get_object;
+use json_helpers::get_string;
+use json_helpers::parse;
 
 #[deriving(Eq, PartialEq, Show)]
 pub struct Game {
@@ -54,92 +58,93 @@ pub struct Game {
 }
 
 /// Builds a game struct given a JSON object map.
-pub fn build(map: &collections::TreeMap<String, json::Json>) -> Result<Game, error::Error> {
+pub fn build(json: &json::Json) -> Result<Game, error::Error> {
+    let map = try!(get_object(json));
     Ok(Game {
         name:
-            try!(json_helpers::find_string(map, "name")),
+            try!(get_string(try!(find(map, "name")))),
         description:
-            try!(json_helpers::find_string(map, "description")),
+            try!(get_string(try!(find(map, "description")))),
         short_description:
-            try!(json_helpers::find_string(map, "shortdescription")),
+            try!(get_string(try!(find(map, "shortdescription")))),
         status:
-            try!(json_helpers::find_i64(map, "status")),
+            try!(get_i64(try!(find(map, "status")))),
         created_datetime:
-            try!(json_helpers::find_string(map, "datecreated")),
+            try!(get_string(try!(find(map, "datecreated")))),
         ended_datetime:
-            try!(json_helpers::find_string(map, "dateended")),
+            try!(get_string(try!(find(map, "dateended")))),
         map_type:
-            try!(json_helpers::find_i64(map, "maptype")),
+            try!(get_i64(try!(find(map, "maptype")))),
         game_type:
-            try!(json_helpers::find_i64(map, "gametype")),
+            try!(get_i64(try!(find(map, "gametype")))),
         win_condition:
-            try!(json_helpers::find_i64(map, "wincondition")),
+            try!(get_i64(try!(find(map, "wincondition")))),
         difficulty:
-            try!(json_helpers::find_float(map, "difficulty")),
+            try!(get_float(try!(find(map, "difficulty")))),
         tutorial_id:
-            try!(json_helpers::find_i64(map, "tutorialid")),
+            try!(get_i64(try!(find(map, "tutorialid")))),
         required_level_id:
-            try!(json_helpers::find_i64(map, "requiredlevelid")),
+            try!(get_i64(try!(find(map, "requiredlevelid")))),
         max_level_id:
-            try!(json_helpers::find_i64(map, "maxlevelid")),
+            try!(get_i64(try!(find(map, "maxlevelid")))),
         master_planet_id:
-            try!(json_helpers::find_i64(map, "masterplanetid")),
+            try!(get_i64(try!(find(map, "masterplanetid")))),
         quadrant:
-            try!(json_helpers::find_i64(map, "quadrant")),
+            try!(get_i64(try!(find(map, "quadrant")))),
         min_tenacity:
-            try!(json_helpers::find_i64(map, "mintenacity")),
+            try!(get_i64(try!(find(map, "mintenacity")))),
         fast_start:
-            try!(json_helpers::find_i64(map, "faststart")),
+            try!(get_i64(try!(find(map, "faststart")))),
         turns_per_week:
-            try!(json_helpers::find_i64(map, "turnsperweek")),
+            try!(get_i64(try!(find(map, "turnsperweek")))),
         year_started:
-            try!(json_helpers::find_i64(map, "yearstarted")),
+            try!(get_i64(try!(find(map, "yearstarted")))),
         is_private:
-            try!(json_helpers::find_bool(map, "isprivate")),
+            try!(get_bool(try!(find(map, "isprivate")))),
         scenario_id:
-            try!(json_helpers::find_i64(map, "scenarioid")),
+            try!(get_i64(try!(find(map, "scenarioid")))),
         created_by:
-            try!(json_helpers::find_string(map, "createdby")),
+            try!(get_string(try!(find(map, "createdby")))),
         turn:
-            try!(json_helpers::find_i64(map, "turn")),
+            try!(get_i64(try!(find(map, "turn")))),
         slots:
-            try!(json_helpers::find_i64(map, "slots")),
+            try!(get_i64(try!(find(map, "slots")))),
         turn_status:
-            try!(json_helpers::find_string(map, "turnstatus")),
+            try!(get_string(try!(find(map, "turnstatus")))),
         host_days:
-            try!(json_helpers::find_string(map, "hostdays")),
+            try!(get_string(try!(find(map, "hostdays")))),
         slow_host_days:
-            try!(json_helpers::find_string(map, "slowhostdays")),
+            try!(get_string(try!(find(map, "slowhostdays")))),
         host_time:
-            try!(json_helpers::find_string(map, "hosttime")),
+            try!(get_string(try!(find(map, "hosttime")))),
         last_backup_path:
-            try!(json_helpers::find_string(map, "lastbackuppath")),
+            try!(get_string(try!(find(map, "lastbackuppath")))),
         next_host_datetime:
-            try!(json_helpers::find_string(map, "nexthost")),
+            try!(get_string(try!(find(map, "nexthost")))),
         all_turns_in:
-            try!(json_helpers::find_bool(map, "allturnsin")),
+            try!(get_bool(try!(find(map, "allturnsin")))),
         last_notified:
-            try!(json_helpers::find_bool(map, "lastnotified")),
+            try!(get_bool(try!(find(map, "lastnotified")))),
         is_hosting:
-            try!(json_helpers::find_bool(map, "ishosting")),
+            try!(get_bool(try!(find(map, "ishosting")))),
         last_loaded_datetime:
-            try!(json_helpers::find_string(map, "lastloadeddate")),
+            try!(get_string(try!(find(map, "lastloadeddate")))),
         deleted_datetime:
-            try!(json_helpers::find_string(map, "deletedate")),
+            try!(get_string(try!(find(map, "deletedate")))),
         last_host_datetime:
-            try!(json_helpers::find_string(map, "lasthostdate")),
+            try!(get_string(try!(find(map, "lasthostdate")))),
         password:
-            try!(json_helpers::find_string(map, "password")),
+            try!(get_string(try!(find(map, "password")))),
         has_password:
-            try!(json_helpers::find_bool(map, "haspassword")),
+            try!(get_bool(try!(find(map, "haspassword")))),
         status_name:
-            try!(json_helpers::find_string(map, "statusname")),
+            try!(get_string(try!(find(map, "statusname")))),
         just_ended:
-            try!(json_helpers::find_bool(map, "justended")),
+            try!(get_bool(try!(find(map, "justended")))),
         time_to_host:
-            try!(json_helpers::find_string(map, "timetohost")),
+            try!(get_string(try!(find(map, "timetohost")))),
         id:
-            try!(json_helpers::find_i64(map, "id")),
+            try!(get_i64(try!(find(map, "id")))),
     })
 }
 
@@ -235,5 +240,5 @@ fn test_build() {
         time_to_host: "Next turn in 27 hours".to_string(),
         id: 25164i64,
     };
-    assert_eq!(result, build(&common::json_to_map(json).unwrap()).unwrap());
+    assert_eq!(result, build(&parse(json).unwrap()).unwrap());
 }

@@ -1,6 +1,3 @@
-/*!
-Structs and functions for reading login data.
-*/
 extern crate serialize;
 
 use self::serialize::json;
@@ -13,7 +10,13 @@ use common;
 #[allow(unused_imports)] // RGB is used for testing
 use common::RGB;
 use error;
-use json_helpers;
+use json_helpers::find;
+use json_helpers::get_bool;
+use json_helpers::get_float;
+use json_helpers::get_i64;
+use json_helpers::get_object;
+use json_helpers::get_string;
+use json_helpers::parse;
 
 /// Represents the login result data structure.
 #[deriving(Eq, PartialEq, Show)]
@@ -22,11 +25,13 @@ pub struct LoginResult {
     pub player_settings: PlayerSettings,
 }
 
-/// Builds a login result struct given a JSON object map.
-pub fn build(map: &collections::TreeMap<String, json::Json>) -> Result<LoginResult, error::Error> {
+/// Builds a login result struct given a JSON object.
+pub fn build(json: &json::Json) -> Result<LoginResult, error::Error> {
+    let map = try!(get_object(json));
+    try!(common::check_success(map));
     Ok(LoginResult {
-        api_key: try!(json_helpers::find_string(map, "apikey")),
-        player_settings: try!(player_settings::build(try!(json_helpers::find_object(map, "settings")))),
+        api_key: try!(get_string(try!(find(map, "apikey")))),
+        player_settings: try!(player_settings::build(try!(find(map, "settings")))),
     })
 }
 
@@ -112,5 +117,5 @@ fn test_build() {
             id: 0,
         },
     };
-    assert_eq!(result, build(&common::json_to_map(json).unwrap()).unwrap());
+    assert_eq!(result, build(&parse(json).unwrap()).unwrap());
 }

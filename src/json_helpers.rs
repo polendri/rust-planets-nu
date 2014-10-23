@@ -10,74 +10,82 @@ use std::f64;
 
 use error;
 
+fn mk_lib_err<T>(msg: String) -> Result<T, error::Error> {
+    Err(error::Error::new(error::LibError, msg))
+}
+
+pub fn parse(json: &str) -> Result<json::Json, error::Error> {
+    match json::from_str(json) {
+        Ok(x) => Ok(x),
+        Err(error) => Err(error::Error::new(
+            error::PlanetsNuError,
+            format!("Error while decoding JSON: {}", error))),
+    }
+}
+
 /// Find a key in the map, or else return an error.
-fn find_key<'a>(map: &'a collections::TreeMap<String, json::Json>, key: String) -> Result<&'a json::Json, error::Error> {
-    match (*map).find(&key) {
+pub fn find<'a>(map: &'a collections::TreeMap<String, json::Json>, key: &str) -> Result<&'a json::Json, error::Error> {
+    match (*map).find(&key.to_string()) {
         Some(x) => Ok(x),
-        None => Err(error::Error::new(
-            error::LibError,
-            format!("Could not find key '{}'.", key))),
+        None => mk_lib_err(format!("Could not find key '{}'.", key)),
     }
 }
 
-pub fn find_object<'a>(map: &'a collections::TreeMap<String, json::Json>, key: &str) -> Result<&'a collections::TreeMap<String, json::Json>, error::Error> {
-    match *try!(find_key(map, key.to_string())) {
+pub fn get_object<'a>(json_enum: &'a json::Json) -> Result<&'a collections::TreeMap<String, json::Json>, error::Error> {
+    match *json_enum {
         json::Object(ref x) => Ok(x),
-        _ => Err(error::Error::new(
-            error::LibError,
-            format!("Expected object type for key '{}' but found something else.", key))),
+        _ => mk_lib_err("Expected object but found something else.".to_string()),
     }
 }
 
-pub fn find_list<'a>(map: &'a collections::TreeMap<String, json::Json>, key: &str) -> Result<&'a Vec<json::Json>, error::Error> {
-    match *try!(find_key(map, key.to_string())) {
+pub fn get_list<'a>(json_enum: &'a json::Json) -> Result<&'a Vec<json::Json>, error::Error> {
+    match *json_enum {
         json::List(ref x) => Ok(x),
-        _ => Err(error::Error::new(
-            error::LibError,
-            format!("Expected list type for key '{}' but found something else.", key))),
+        _ => mk_lib_err("Expected list but found something else.".to_string()),
     }
 }
 
-pub fn find_bool(map: &collections::TreeMap<String, json::Json>, key: &str) -> Result<bool, error::Error> {
-    match *try!(find_key(map, key.to_string())) {
+pub fn get_bool<'a>(json_enum: &'a json::Json) -> Result<bool, error::Error> {
+    match *json_enum {
         json::Boolean(x) => Ok(x),
         json::String(ref x) => match (*x).as_slice() {
             "true" => Ok(true),
             "false" => Ok(false),
-            _ => Err(error::Error::new(
-                error::LibError,
-                format!("Expected bool value for key '{}' but found a string.", key))),
+            _ => mk_lib_err("Expected bool but found a string.".to_string()),
         },
-        _ => Err(error::Error::new(
-            error::LibError,
-            format!("Expected string value for key '{}' but found something else.", key))),
+        _ => mk_lib_err("Expected bool but found something else.".to_string()),
     }
 }
 
-pub fn find_i64(map: &collections::TreeMap<String, json::Json>, key: &str) -> Result<i64, error::Error> {
-    match *try!(find_key(map, key.to_string())) {
+pub fn get_i64<'a>(json_enum: &'a json::Json) -> Result<i64, error::Error> {
+    match *json_enum {
         json::I64(x) => Ok(x),
         json::U64(x) => Ok(x as i64),
-        _ => Err(error::Error::new(
-            error::LibError,
-            format!("Expected int type for key '{}' but found something else.", key))),
+        _ => mk_lib_err("Expected int but found something else.".to_string()),
     }
 }
 
-pub fn find_float(map: &collections::TreeMap<String, json::Json>, key: &str) -> Result<String, error::Error> {
-    match *try!(find_key(map, key.to_string())) {
+pub fn get_float<'a>(json_enum: &'a json::Json) -> Result<String, error::Error> {
+    match *json_enum {
         json::F64(x) => Ok(f64::to_str_digits(x, 15)),
-        _ => Err(error::Error::new(
-            error::LibError,
-            format!("Expected float type for key '{}' but found something else.", key))),
+        _ => mk_lib_err("Expected float but found something else.".to_string()),
     }
 }
 
-pub fn find_string(map: &collections::TreeMap<String, json::Json>, key: &str) -> Result<String, error::Error> {
-    match *try!(find_key(map, key.to_string())) {
+pub fn get_string<'a>(json_enum: &'a json::Json) -> Result<String, error::Error> {
+    match *json_enum {
         json::String(ref x) => Ok(x.clone()),
-        _ => Err(error::Error::new(
-            error::LibError,
-            format!("Expected string type for key '{}' but found something else.", key))),
+        _ => mk_lib_err("Expected string but found something else.".to_string()),
     }
 }
+
+// TODO: tests
+/*
+#[test]
+fn test_json_to_map() {
+    let input = "{ \"key1\" : true, \"key2\" : \"value\" }";
+    let map = json_to_map(input).unwrap();
+    assert_eq!(json::Boolean(true), *map.find(&"key1".to_string()).unwrap());
+    assert_eq!(json::String("value".to_string()), *map.find(&"key2".to_string()).unwrap());
+}
+*/
