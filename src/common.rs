@@ -30,7 +30,10 @@ pub fn to_rgb(rgb_str: &str) -> Result<RGB, error::Error> {
         return Err(long_err);
     }
     let mut iter = rgb_str.chars();
-    try_match!(iter.next().unwrap(), '#' => (), str_to_err("Could not find leading '#'.".to_string()));
+    match iter.next().unwrap() {
+        '#' => (),
+        _ => return Err(str_to_err("Could not find leading '#'.".to_string())),
+    };
     let r = (expect!(char::to_digit(iter.next().unwrap(), 16), digit_err) as u8 << 4) +
         expect!(char::to_digit(iter.next().unwrap(), 16), digit_err) as u8;
     let g = (expect!(char::to_digit(iter.next().unwrap(), 16), digit_err) as u8 << 4) +
