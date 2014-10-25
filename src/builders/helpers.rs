@@ -18,6 +18,8 @@ pub struct RGB {
     pub green: u8,
     pub blue: u8,
 }
+// TODO: move RBG into a public 'data' module.
+// TODO: function to convert an RGB back to a string.
 
 /// Converts a string of the form "#XXXXXX" (where X is a hex digit) to an RGB object.
 pub fn to_rgb(rgb_str: &str) -> Result<RGB, error::Error> {

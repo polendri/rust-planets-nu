@@ -15,7 +15,8 @@ use parse;
 
 /// Make a call to the login API.
 ///
-/// TODO: Way more documentation; code examples.
+/// The purpose of this call is to retrieve an API key that can be passed along in other API
+/// requests. It also retrieves the settings for the user.
 pub fn login(username: &str, password: &str) -> Result<login::LoginResult, error::Error> {
     let url = format!("http://api.planets.nu/login?username={0}&password={1}", username, password);
     let response = try!(http_get(url.as_slice()));
@@ -24,8 +25,7 @@ pub fn login(username: &str, password: &str) -> Result<login::LoginResult, error
 
 /// Make a call to the games list API.
 ///
-/// TODO: Way more documentation; code examples.
-/// TODO: params should have their own structs
+/// This call retrieves the list of all games, which can be filtered by several criteria.
 pub fn list_games(status: Option<&str>,
                   game_type: Option<&str>,
                   scope: Option<&str>,

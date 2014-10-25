@@ -8,24 +8,42 @@ use json_helpers::{find, get_bool, get_i64, get_object, get_string};
 
 // Public
 
+/// Contains all player settings.
 #[deriving(Eq, PartialEq, Show)]
 pub struct PlayerSettings {
+    /// The colour gradient for player planets.
     pub player_planet_colors: (RGB, RGB),
+    /// The colour gradient for enemy planets.
     pub enemy_planet_colors: (RGB, RGB),
+    /// The colour gradient for allied planets.
     pub ally_planet_colors: (RGB, RGB),
+    /// The colour gradient for info planets.
     pub info_planet_colors: (RGB, RGB),
+    /// The colour gradient for unknown planets.
     pub unknown_planet_colors: (RGB, RGB),
+    /// The colour gradient for player ships.
     pub player_ship_colors: (RGB, RGB),
+    /// The colour gradient for enemy ships.
     pub enemy_ship_colors: (RGB, RGB),
+    /// The colour gradient for allied ships.
     pub ally_ship_colors: (RGB, RGB),
+    /// The colour for player mines.
     pub player_mine_color: RGB,
+    /// The colour for enemy mines.
     pub enemy_mine_color: RGB,
+    /// The colour for web mines.
     pub web_mine_color: RGB,
+    /// The colour for ally mines.
     pub ally_mine_color: RGB,
+    /// The colour for ion storms.
     pub ion_storm_color: RGB,
+    /// Whether or not the assistant is enabled.
     pub assistant_enabled: bool,
+    /// Whether or not mouse zoom is enabled.
     pub mouse_zoom_enabled: bool,
+    /// Whether or not sound effects are enabled.
     pub sound_effects_enabled: bool,
+    /// Whether or not music is enabled.
     pub music_enabled: bool,
     pub battle_task_id: i64,
     pub battle_tutorial_id: i64,

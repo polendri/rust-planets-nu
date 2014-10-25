@@ -9,9 +9,12 @@ use json_helpers::{find, get_object, get_string};
 
 // Public
 
+/// Contains the data returned in a login API response.
 #[deriving(Eq, PartialEq, Show)]
 pub struct LoginResult {
+    /// The API key for the user, to authenticate in future API calls.
     pub api_key: String,
+    /// The settings for the user.
     pub player_settings: PlayerSettings,
 }
 
