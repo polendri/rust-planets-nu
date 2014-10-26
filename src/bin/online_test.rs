@@ -22,7 +22,15 @@ fn main() {
     println!("Online test run has begun.\n");
 
     print_result("login", request::login("rusty314159", "rusty314159"));
-    // TODO: games list test
+    print_result(
+        "list_games",
+        request::list_games(
+            request::STATUS_JOINING | request::STATUS_RUNNING,
+            request::GAME_TYPE_STANDARD | request::GAME_TYPE_TEAM | request::GAME_TYPE_MELEE,
+            request::PublicScope,
+            &Vec::new(),
+            None,
+            Some(0i64)));
 
     println!("\nOnline test run has completed.");
 }

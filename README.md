@@ -19,6 +19,7 @@ To start using this library in a Cargo-enabled project:
 
   * Install Rust and Cargo by following the Rust Guide's [installation instructions](http://doc.rust-lang.org/guide.html#installing-rust);
   * Add the following to your project's `Cargo.toml` file:
+
     ```
     [dependencies.planets_nu]
     git = "https://github.com/pshendry/rust-planets-nu.git"
@@ -54,9 +55,25 @@ use self::planets_nu::parse;
         print!(result);
         ```
     * [Reference](http://www.rust-ci.org/pshendry/rust-planets-nu/doc/planets_nu/request/fn.login.html)
+  * **List Games:**
+    * Example:
+
+        ```rust
+        let result = request::list_games(
+            request::STATUS_DEFAULT,
+            request::GAME_TYPE_DEFAULT,
+            request::DefaultScope,
+            &Vec::new(),
+            None,
+            None);
+        //let result = parse::list_games("[json string]");
+        print!(result);
+        ```
+    * [Reference](http://www.rust-ci.org/pshendry/rust-planets-nu/doc/planets_nu/request/fn.list_games.html)
 
 Reference Documentation
 -----------------------
 
   * Reference documentation for rust-planets-nu is available at http://www.rust-ci.org/pshendry/rust-planets-nu/doc/planets_nu/.
   * Official documentation for the planets.nu API is available on the [planets.nu website](http://planets.nu/api-documentation), and unofficial documentation is available on the [VGA Planets Wiki](http://vgaplanets.org/index.php/Planets.Nu_API).
+

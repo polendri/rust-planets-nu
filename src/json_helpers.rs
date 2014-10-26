@@ -36,7 +36,7 @@ pub fn find<'a>(map: &'a collections::TreeMap<String, json::Json>, key: &str) ->
 pub fn get_object<'a>(json_enum: &'a json::Json) -> Result<&'a collections::TreeMap<String, json::Json>, error::Error> {
     match *json_enum {
         json::Object(ref x) => Ok(x),
-        _ => mk_lib_err("Expected object but found something else.".to_string()),
+        _ => mk_lib_err(format!("Expected object but found something else: {}", *json_enum)),
     }
 }
 
@@ -44,7 +44,7 @@ pub fn get_object<'a>(json_enum: &'a json::Json) -> Result<&'a collections::Tree
 pub fn get_list<'a>(json_enum: &'a json::Json) -> Result<&'a Vec<json::Json>, error::Error> {
     match *json_enum {
         json::List(ref x) => Ok(x),
-        _ => mk_lib_err("Expected list but found something else.".to_string()),
+        _ => mk_lib_err(format!("Expected list but found something else: {}", *json_enum)),
     }
 }
 
@@ -57,7 +57,7 @@ pub fn get_bool<'a>(json_enum: &'a json::Json) -> Result<bool, error::Error> {
             "false" => Ok(false),
             _ => mk_lib_err("Expected bool but found a string.".to_string()),
         },
-        _ => mk_lib_err("Expected bool but found something else.".to_string()),
+        _ => mk_lib_err(format!("Expected bool but found something else: {}", *json_enum)),
     }
 }
 
@@ -66,7 +66,7 @@ pub fn get_i64<'a>(json_enum: &'a json::Json) -> Result<i64, error::Error> {
     match *json_enum {
         json::I64(x) => Ok(x),
         json::U64(x) => Ok(x as i64),
-        _ => mk_lib_err("Expected int but found something else.".to_string()),
+        _ => mk_lib_err(format!("Expected int but found something else: {}", *json_enum)),
     }
 }
 
@@ -76,8 +76,10 @@ pub fn get_i64<'a>(json_enum: &'a json::Json) -> Result<i64, error::Error> {
 /// because Rust does not appear to have a decimal type that is easy to use.
 pub fn get_float<'a>(json_enum: &'a json::Json) -> Result<String, error::Error> {
     match *json_enum {
+        json::I64(x) => Ok(format!("{}", x)),
+        json::U64(x) => Ok(format!("{}", x)),
         json::F64(x) => Ok(f64::to_str_digits(x, 15)),
-        _ => mk_lib_err("Expected float but found something else.".to_string()),
+        _ => mk_lib_err(format!("Expected float but found something else: {}", *json_enum)),
     }
 }
 
@@ -85,6 +87,6 @@ pub fn get_float<'a>(json_enum: &'a json::Json) -> Result<String, error::Error> 
 pub fn get_string<'a>(json_enum: &'a json::Json) -> Result<String, error::Error> {
     match *json_enum {
         json::String(ref x) => Ok(x.clone()),
-        _ => mk_lib_err("Expected string but found something else.".to_string()),
+        _ => mk_lib_err(format!("Expected string but found something else: {}", *json_enum)),
     }
 }
