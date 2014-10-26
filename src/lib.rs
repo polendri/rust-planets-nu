@@ -9,6 +9,7 @@ macro_rules! expect(
     ($e1:expr, $e2:expr) => (match $e1 { Some(s) => s, None => return Err($e2) })
 )
 
+pub mod data;
 pub mod error;
 pub mod parse;
 pub mod request;

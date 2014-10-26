@@ -32,7 +32,7 @@ pub fn build(json: &json::Json) -> Result<LoginResult, error::Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use builders::helpers::RGB;
+    use data::RGB;
     use builders::player_settings::PlayerSettings;
     use json_helpers::parse;
 

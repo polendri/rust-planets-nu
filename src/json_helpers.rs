@@ -88,18 +88,3 @@ pub fn get_string<'a>(json_enum: &'a json::Json) -> Result<String, error::Error>
         _ => mk_lib_err("Expected string but found something else.".to_string()),
     }
 }
-
-// TODO: tests
-/*
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_json_to_map() {
-        let input = "{ \"key1\" : true, \"key2\" : \"value\" }";
-        let map = json_to_map(input).unwrap();
-        assert_eq!(json::Boolean(true), *map.find(&"key1".to_string()).unwrap());
-        assert_eq!(json::String("value".to_string()), *map.find(&"key2".to_string()).unwrap());
-    }
-}
-*/

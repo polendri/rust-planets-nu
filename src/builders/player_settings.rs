@@ -2,7 +2,7 @@ extern crate serialize;
 
 use self::serialize::json;
 
-use builders::helpers::{mod, RGB};
+use data::{mod, RGB};
 use error;
 use json_helpers::{find, get_bool, get_i64, get_object, get_string};
 
@@ -54,39 +54,39 @@ pub fn build(json: &json::Json) -> Result<PlayerSettings, error::Error> {
     let map = try!(get_object(json));
     Ok(PlayerSettings {
         player_planet_colors: (
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "myplanetfrom")))).as_slice())),
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "myplanetto")))).as_slice()))),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "myplanetfrom")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "myplanetto")))).as_slice()))),
         enemy_planet_colors: (
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "enemyplanetfrom")))).as_slice())),
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "enemyplanetto")))).as_slice()))),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "enemyplanetfrom")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "enemyplanetto")))).as_slice()))),
         ally_planet_colors: (
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "allyplanetfrom")))).as_slice())),
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "allyplanetto")))).as_slice()))),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "allyplanetfrom")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "allyplanetto")))).as_slice()))),
         info_planet_colors: (
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "infoplanetfrom")))).as_slice())),
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "infoplanetto")))).as_slice()))),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "infoplanetfrom")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "infoplanetto")))).as_slice()))),
         unknown_planet_colors: (
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "unknownplanetfrom")))).as_slice())),
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "unknownplanetto")))).as_slice()))),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "unknownplanetfrom")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "unknownplanetto")))).as_slice()))),
         player_ship_colors: (
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "myshipfrom")))).as_slice())),
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "myshipto")))).as_slice()))),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "myshipfrom")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "myshipto")))).as_slice()))),
         enemy_ship_colors: (
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "enemyshipfrom")))).as_slice())),
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "enemyshipto")))).as_slice()))),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "enemyshipfrom")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "enemyshipto")))).as_slice()))),
         ally_ship_colors: (
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "allyshipfrom")))).as_slice())),
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "allyshipto")))).as_slice()))),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "allyshipfrom")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "allyshipto")))).as_slice()))),
         player_mine_color:
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "mymines")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "mymines")))).as_slice())),
         enemy_mine_color:
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "enemymines")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "enemymines")))).as_slice())),
         web_mine_color:
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "webmines")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "webmines")))).as_slice())),
         ally_mine_color:
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "allymines")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "allymines")))).as_slice())),
         ion_storm_color:
-            try!(helpers::to_rgb(try!(get_string(try!(find(map, "ionstorms")))).as_slice())),
+            try!(data::to_rgb(try!(get_string(try!(find(map, "ionstorms")))).as_slice())),
         assistant_enabled:
             try!(get_bool(try!(find(map, "assistanton")))),
         mouse_zoom_enabled:
@@ -109,7 +109,7 @@ pub fn build(json: &json::Json) -> Result<PlayerSettings, error::Error> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use builders::helpers::RGB;
+    use data::RGB;
     use json_helpers::parse;
 
     #[test]
