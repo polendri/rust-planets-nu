@@ -75,7 +75,7 @@ pub fn build(json: &json::Json) -> Result<Game, error::Error> {
         win_condition:
             try!(get_i64(try!(find(map, "wincondition")))),
         difficulty:
-            try!(get_float(try!(find(map, "difficulty")))),
+            try!(get_float(try!(find(map, "difficulty")), 15u)),
         tutorial_id:
             try!(get_i64(try!(find(map, "tutorialid")))),
         required_level_id:

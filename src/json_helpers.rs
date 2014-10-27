@@ -74,11 +74,11 @@ pub fn get_i64<'a>(json_enum: &'a json::Json) -> Result<i64, error::Error> {
 ///
 /// Note: returns the result as a String to ensure exact representation,
 /// because Rust does not appear to have a decimal type that is easy to use.
-pub fn get_float<'a>(json_enum: &'a json::Json) -> Result<String, error::Error> {
+pub fn get_float<'a>(json_enum: &'a json::Json, sig_digits: uint) -> Result<String, error::Error> {
     match *json_enum {
         json::I64(x) => Ok(format!("{}", x)),
         json::U64(x) => Ok(format!("{}", x)),
-        json::F64(x) => Ok(f64::to_str_digits(x, 15)),
+        json::F64(x) => Ok(f64::to_str_digits(x, sig_digits)),
         _ => mk_lib_err(format!("Expected float but found something else: {}", *json_enum)),
     }
 }
