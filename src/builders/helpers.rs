@@ -7,8 +7,31 @@ use self::serialize::json;
 use std::collections;
 
 use error;
+use json_helpers::{find, get_i64};
 
 // Public
+
+pub fn map_with_err<T, R, E>(vec: &Vec<T>, f: |&T| -> Result<R, E>) -> Result<Vec<R>, E> {
+    let mut result: Vec<R> = Vec::with_capacity(vec.len());
+    for item in vec.iter() {
+        match f(item) {
+            Ok(x) => result.push(x),
+            Err(e) => return Err(e),
+        }
+    }
+    Ok(result)
+}
+
+/// Reads an (x,y) coordinate pair from a JSON object.
+pub fn get_coordinates(obj: &json::Json) -> Result<(i64, i64), error::Error> {
+    match *obj {
+        json::Object(ref map) => Ok(
+            (try!(get_i64(try!(find(map, "x")))), try!(get_i64(try!(find(map, "y")))))),
+        _ => Err(error::Error::new(
+            error::LibError,
+            "Expected a JSON coordinate object but found something else.".to_string())),
+    }
+}
 
 /// Checks for the 'success' key in order to determine whether an API response
 /// indicates success or failure.
@@ -56,6 +79,11 @@ mod tests {
     use super::serialize::json;
     use std::collections;
     use error;
+
+    #[test]
+    fn test_get_coordinates() {
+        assert_eq!((123i64, 4i64), get_coordinates(&json::from_str("{ \"x\": 123, \"y\": 4 }").unwrap()).unwrap());
+    }
 
     #[test]
     fn test_check_success_errors() {
