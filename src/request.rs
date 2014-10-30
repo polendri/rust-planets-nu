@@ -12,6 +12,7 @@ use std::vec;
 
 use error;
 use builders::game;
+use builders::load_turn;
 use builders::login;
 use parse;
 
@@ -57,16 +58,52 @@ pub fn login(username: &str, password: &str) -> Result<login::LoginResult, error
 /// Make a call to the games list API.
 ///
 /// This call retrieves the list of all games, which can be filtered by several criteria.
-pub fn list_games(status: GameStatusFlags,
-                  game_type: GameTypeFlags,
-                  scope: GameScope,
-                  ids: &Vec<i64>,
-                  username: Option<&str>,
-                  limit: Option<i64>) -> Result<Vec<game::Game>, error::Error> {
-
+///
+/// status: Retrieve only games with the specified statuses.
+/// game_type: Retrieve only games with the specified game types.
+/// scope: Retrieve only games with the specified scope.
+/// ids: Retrieve only games with the specified IDs.
+/// username: Username of account to list games.
+///
+/// Will list all games for this user regardless of settings.
+/// The maximum number of records to return.
+// TODO: document the parameters better
+pub fn list_games(
+    status: GameStatusFlags,
+    game_type: GameTypeFlags,
+    scope: GameScope,
+    ids: &Vec<i64>,
+    username: Option<&str>,
+    limit: Option<i64>) -> Result<Vec<game::Game>, error::Error>
+{
     let url = build_games_list_url(status, game_type, scope, ids, username, limit);
     let response = try!(http_get(url.as_slice()));
     parse::list_games(try!(decode_response(&response)).as_slice())
+}
+
+
+/// Make a call to the load turn API.
+///
+/// This call retrieves all information relating to a single turn of a game.
+/// game_id: The game ID for which the turn is requested.
+/// turn: The turn number requested (if unspecified, the latest turn is used).
+/// api_key: The API key from the login API call. Used to authenticate calls for active games.
+/// player_id: The player to request a turn for.
+///
+/// In an active game this must be the ID of the player to which the API key belongs.
+/// for_save: Indicates if the client intends to make a call to the save turn API.
+// TODO: document the parameters better
+pub fn load_turn(
+    game_id: i64,
+    turn: Option<i64>,
+    api_key: Option<&str>,
+    player_id: Option<i64>,
+    for_save: bool) -> Result<load_turn::LoadTurnResult, error::Error>
+{
+
+    let url = build_load_turn_url(game_id, turn, api_key, player_id, for_save);
+    let response = try!(http_get(url.as_slice()));
+    parse::load_turn(try!(decode_response(&response)).as_slice())
 }
 
 // Private
@@ -162,6 +199,32 @@ fn build_games_list_url(status: GameStatusFlags,
     url
 }
 
+/// Builds the URL used for the load turn API.
+fn build_load_turn_url(game_id: i64,
+                       turn: Option<i64>,
+                       api_key: Option<&str>,
+                       player_id: Option<i64>,
+                       for_save: bool) -> String {
+    let mut url = "http://api.planets.nu/game/loadturn?gameid=".to_string() + game_id.to_string();
+
+    match turn {
+        Some(i) => url = url + "&turn=" + i.to_string(),
+        None => (),
+    };
+
+    match api_key {
+        Some(s) => url = url + "&apikey=" + s.to_string(),
+        None => (),
+    };
+
+    match player_id {
+        Some(i) => url = url + "&playerid=" + i.to_string(),
+        None => (),
+    };
+
+    url + "&forsave=" + for_save.to_string()
+}
+
 /// Performs an HTTP GET request, returning the response (or an error).
 fn http_get(url: &str) -> Result<http::Response, error::Error> {
     match http::handle().get(url).exec() {
@@ -221,6 +284,7 @@ fn bytes_to_str<'a>(bytes: &'a [u8]) -> Result<&'a str, error::Error> {
 mod tests {
     use super::*;
     use super::build_games_list_url;
+    use super::build_load_turn_url;
     use request;
 
     #[test]
@@ -248,5 +312,19 @@ mod tests {
                 &vec![12,13371337],
                 Some("theuser"),
                 Some(123i64)).as_slice());
+    }
+
+    #[test]
+    fn test_build_load_turn_url_defaults() {
+        assert_eq!(
+            "http://api.planets.nu/game/loadturn?gameid=1337&forsave=false",
+            build_load_turn_url(1337, None, None, None, false).as_slice());
+    }
+
+    #[test]
+    fn test_build_load_turn_url() {
+        assert_eq!(
+            "http://api.planets.nu/game/loadturn?gameid=1337&turn=5&apikey=theapikey&playerid=123&forsave=true",
+            build_load_turn_url(1337, Some(5i64), Some("theapikey"), Some(123i64), true).as_slice());
     }
 }

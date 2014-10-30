@@ -3,6 +3,7 @@ pub mod game_settings;
 pub mod list_games;
 pub mod load_turn;
 pub mod login;
+pub mod minefield;
 pub mod planet;
 pub mod player;
 pub mod player_score;

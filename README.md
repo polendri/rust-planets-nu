@@ -59,6 +59,7 @@ use self::planets_nu::parse;
     * Example:
 
         ```rust
+        // List games using all default parameters
         let result = request::list_games(
             request::STATUS_DEFAULT,
             request::GAME_TYPE_DEFAULT,
@@ -70,6 +71,16 @@ use self::planets_nu::parse;
         print!(result);
         ```
     * [Reference](http://www.rust-ci.org/pshendry/rust-planets-nu/doc/planets_nu/request/fn.list_games.html)
+  * **Load Turn:**
+    * Example:
+
+        ```rust
+        // Load turn 5 from game 815 as player 1
+        let result = request::load_turn(815i64, Some(5i64), None, Some(1i64), false);
+        //let result = parse::load_turn("[json string]");
+        print!(result);
+        ```
+    * [Reference](http://www.rust-ci.org/pshendry/rust-planets-nu/doc/planets_nu/request/fn.load_turn.html)
 
 Reference Documentation
 -----------------------

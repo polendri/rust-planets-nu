@@ -5,13 +5,14 @@ use self::serialize::json;
 use builders::game::{mod, Game};
 use builders::game_settings::{mod, GameSettings};
 use builders::helpers;
-//use builders::planet::{mod, Planet};
+use builders::minefield::{mod, Minefield};
+use builders::planet::{mod, Planet};
 use builders::player::{mod, Player};
-//use builders::player_score::{mod, PlayerScore};
+use builders::player_score::{mod, PlayerScore};
 use builders::player_settings::{mod, PlayerSettings};
-//use builders::ship::{mod, Ship};
+use builders::ship::{mod, Ship};
 use error;
-use json_helpers::{find, get_bool, get_i64, get_list, get_object, get_string};
+use json_helpers::{find, get_bool, get_list, get_object, get_string};
 
 macro_rules! get(
     ($i1:ident, $e:expr, $i2:ident) => (try!($i2(try!(find($i1, $e)))))
@@ -25,16 +26,16 @@ pub struct LoadTurnResult {
     pub game: Game,
     pub player: Player,
     pub players: Vec<Player>,
-    //pub player_scores: Vec<PlayerScore>,
+    pub player_scores: Vec<PlayerScore>,
     //pub maps: 
-    //pub planets: Vec<Planet>,
-    //pub ships: Vec<Ship>,
+    pub planets: Vec<Planet>,
+    pub ships: Vec<Ship>,
     //pub ion_storms: 
     //pub nebulas: 
     //pub stars: 
     //pub starbases: 
     //pub stock: 
-    //pub minefields: 
+    pub minefields: Vec<Minefield>,
     //pub relations: 
     //pub messages: 
     //pub my_messages: 
@@ -63,16 +64,24 @@ pub fn build(json: &json::Json) -> Result<LoadTurnResult, error::Error> {
         players: try!(helpers::map_with_err(
             get!(rst, "players", get_list),
             |x| player::build(x))),
-        //player_scores: Vec<PlayerScore>,
+        player_scores: try!(helpers::map_with_err(
+            get!(rst, "scores", get_list),
+            |x| player_score::build(x))),
         //maps: 
-        //planets: Vec<Planet>,
-        //ships: Vec<Ship>,
+        planets: try!(helpers::map_with_err(
+            get!(rst, "planets", get_list),
+            |x| planet::build(x))),
+        ships: try!(helpers::map_with_err(
+            get!(rst, "ships", get_list),
+            |x| ship::build(x))),
         //ion_storms: 
         //nebulas: 
         //stars: 
         //starbases: 
         //stock: 
-        //minefields: 
+        minefields: try!(helpers::map_with_err(
+            get!(rst, "minefields", get_list),
+            |x| minefield::build(x))),
         //relations: 
         //messages: 
         //my_messages: 
@@ -98,8 +107,12 @@ mod tests {
     use super::*;
     use builders::game::Game;
     use builders::game_settings::GameSettings;
+    use builders::minefield::Minefield;
+    use builders::planet::{Planet, PlanetMineral};
     use builders::player::Player;
+    use builders::player_score::PlayerScore;
     use builders::player_settings::PlayerSettings;
+    use builders::ship::Ship;
     use data::RGB;
     use json_helpers::parse;
 
@@ -291,7 +304,7 @@ mod tests {
                     {\
                         \"dateadded\": \"10/8/2014 5:10:54 PM\",\
                         \"ownerid\": 1,\
-                        \"accountid\": 21199,\
+                        \"accountid\": 12345,\
                         \"capitalships\": 5,\
                         \"freighters\": 2,\
                         \"planets\": 11,\
@@ -315,68 +328,68 @@ mod tests {
                 \"maps\": [],\
                 \"planets\": [\
                     {\
-                        \"name\": \"Taulus\",\
-                        \"x\": 1848,\
-                        \"y\": 1797,\
-                        \"friendlycode\": \"???\",\
-                        \"mines\": -1,\
-                        \"factories\": -1,\
-                        \"defense\": -1,\
+                        \"name\": \"Omicron 2 Eridani\",\
+                        \"x\": 2543,\
+                        \"y\": 1592,\
+                        \"friendlycode\": \"hGz\",\
+                        \"mines\": 364,\
+                        \"factories\": 265,\
+                        \"defense\": 20,\
                         \"targetmines\": 0,\
                         \"targetfactories\": 0,\
                         \"targetdefense\": 0,\
-                        \"builtmines\": 0,\
-                        \"builtfactories\": 0,\
+                        \"builtmines\": 4,\
+                        \"builtfactories\": 4,\
                         \"builtdefense\": 0,\
                         \"buildingstarbase\": false,\
-                        \"megacredits\": -1,\
-                        \"supplies\": -1,\
+                        \"megacredits\": 23,\
+                        \"supplies\": 259,\
                         \"suppliessold\": 0,\
-                        \"neutronium\": -1,\
-                        \"molybdenum\": -1,\
-                        \"duranium\": -1,\
-                        \"tritanium\": -1,\
-                        \"groundneutronium\": -1,\
-                        \"groundmolybdenum\": -1,\
-                        \"groundduranium\": -1,\
-                        \"groundtritanium\": -1,\
-                        \"densityneutronium\": -1,\
-                        \"densitymolybdenum\": -1,\
-                        \"densityduranium\": -1,\
-                        \"densitytritanium\": -1,\
+                        \"neutronium\": 158,\
+                        \"molybdenum\": 1851,\
+                        \"duranium\": 207,\
+                        \"tritanium\": 934,\
+                        \"groundneutronium\": 9011,\
+                        \"groundmolybdenum\": 5,\
+                        \"groundduranium\": 2827,\
+                        \"groundtritanium\": 1954,\
+                        \"densityneutronium\": 50,\
+                        \"densitymolybdenum\": 95,\
+                        \"densityduranium\": 15,\
+                        \"densitytritanium\": 20,\
                         \"totalneutronium\": 0,\
                         \"totalmolybdenum\": 0,\
                         \"totalduranium\": 0,\
                         \"totaltritanium\": 0,\
-                        \"checkneutronium\": 0,\
-                        \"checkmolybdenum\": 0,\
-                        \"checkduranium\": 0,\
-                        \"checktritanium\": 0,\
-                        \"checkmegacredits\": 0,\
-                        \"checksupplies\": 0,\
-                        \"temp\": -1,\
-                        \"ownerid\": 0,\
-                        \"clans\": -1,\
+                        \"checkneutronium\": 513,\
+                        \"checkmolybdenum\": 1921,\
+                        \"checkduranium\": 337,\
+                        \"checktritanium\": 1024,\
+                        \"checkmegacredits\": 13634,\
+                        \"checksupplies\": 1208,\
+                        \"temp\": 50,\
+                        \"ownerid\": 3,\
+                        \"clans\": 26448,\
                         \"colchange\": 0,\
-                        \"colonisttaxrate\": 0,\
-                        \"colonisthappypoints\": 0,\
-                        \"colhappychange\": 0,\
-                        \"nativeclans\": -1,\
+                        \"colonisttaxrate\": 16,\
+                        \"colonisthappypoints\": 100,\
+                        \"colhappychange\": -6,\
+                        \"nativeclans\": 0,\
                         \"nativechange\": 0,\
                         \"nativegovernment\": 0,\
                         \"nativetaxvalue\": 0,\
                         \"nativetype\": 0,\
                         \"nativetaxrate\": 0,\
-                        \"nativehappypoints\": 0,\
-                        \"nativehappychange\": 0,\
-                        \"infoturn\": 0,\
+                        \"nativehappypoints\": 80,\
+                        \"nativehappychange\": 1,\
+                        \"infoturn\": 7,\
                         \"debrisdisk\": 0,\
-                        \"flag\": 0,\
-                        \"readystatus\": 0,\
-                        \"img\": \"http://library.vgaplanets.nu/planets/unknown.png\",\
+                        \"flag\": 1,\
+                        \"readystatus\": 1,\
+                        \"img\": \"http://library.vgaplanets.nu/planets/150.png\",\
                         \"nativeracename\": \"none\",\
                         \"nativegovernmentname\": \"?\",\
-                        \"id\": 1\
+                        \"id\": 452\
                     }\
                 ],\
                 \"ships\": [\
@@ -429,8 +442,30 @@ mod tests {
                         \"goal\": 0,\
                         \"goaltarget\": 0,\
                         \"goaltarget2\": 0,\
-                        \"waypoints\": [],\
-                        \"history\": [],\
+                        \"waypoints\": [\
+                            {\
+                                \"x\": 2626,\
+                                \"y\": 1482\
+                            }\
+                        ],\
+                        \"history\": [\
+                            {\
+                                \"x\": 2584,\
+                                \"y\": 1544\
+                            },\
+                            {\
+                                \"x\": 2543,\
+                                \"y\": 1592\
+                            },\
+                            {\
+                                \"x\": 2545,\
+                                \"y\": 1635\
+                            },\
+                            {\
+                                \"x\": 2543,\
+                                \"y\": 1592\
+                            }\
+                        ],\
                         \"iscloaked\": false,\
                         \"readystatus\": 0,\
                         \"id\": 1\
@@ -494,7 +529,19 @@ mod tests {
                         \"id\": 114\
                     }\
                 ],\
-                \"minefields\": [],\
+                \"minefields\": [\
+                    {\
+                        \"ownerid\":7,\
+                        \"isweb\":true,\
+                        \"units\":1253,\
+                        \"infoturn\":17,\
+                        \"friendlycode\":\"???\",\
+                        \"x\":2729,\
+                        \"y\":2335,\
+                        \"radius\":35,\
+                        \"id\":1\
+                    }\
+                ],\
                 \"relations\": [\
                     {\
                         \"playerid\": 3,\
@@ -865,6 +912,175 @@ mod tests {
                 tutorial_task_id: 0i64,
                 id: 1i64,
             }],
+            player_scores: vec![PlayerScore {
+                added_datetime: "10/8/2014 5:10:54 PM".to_string(),
+                owner_id: 1i64,
+                account_id: 12345i64,
+                capital_ships: 5i64,
+                freighters: 2i64,
+                planets: 11i64,
+                starbases: 1i64,
+                military_score: 10754i64,
+                inventory_score: 282i64,
+                priority_points: 0i64,
+                turn: 7i64,
+                percent: "17.88".to_string(),
+                id: 37i64,
+            }],
+            //maps: 
+            planets: vec![Planet {
+                name:                   "Omicron 2 Eridani".to_string(),
+                position: (2543i64, 1592i64),
+                friendly_code:          "hGz".to_string(),
+                mines:                  364i64,
+                factories:              265i64,
+                defense:                20i64,
+                target_mines:           0i64,
+                target_factories:       0i64,
+                target_defense:         0i64,
+                built_mines:            4i64,
+                built_factories:        4i64,
+                built_defense:          0i64,
+                building_starbase:      false,
+                megacredits:            23i64,
+                supplies:               259i64,
+                supplies_sold:          0i64,
+                neutronium:
+                    PlanetMineral {
+                        surface_count:  158i64,
+                        ground_count:   9011i64,
+                        check_count:    513i64,
+                        density:        50i64,
+                        total:          0i64,
+                    },
+                molybdenum:
+                    PlanetMineral {
+                        surface_count:  1851i64,
+                        ground_count:   5i64,
+                        check_count:    1921i64,
+                        density:        95i64,
+                        total:          0i64,
+                    },
+                duranium:
+                    PlanetMineral {
+                        surface_count:  207i64,
+                        ground_count:   2827i64,
+                        check_count:    337i64,
+                        density:        15i64,
+                        total:          0i64,
+                    },
+                tritanium:
+                    PlanetMineral {
+                        surface_count:  934i64,
+                        ground_count:   1954i64,
+                        check_count:    1024i64,
+                        density:        20i64,
+                        total:          0i64,
+                    },
+                temp:                   50i64,
+                owner_id:               3i64,
+                clans:                  26448i64,
+                colonist_change:        0i64,
+                colonist_tax_rate:      16i64,
+                colonist_happy_points:  100i64,
+                colonist_happy_change:  -6i64,
+                native_clans:           0i64,
+                native_change:          0i64,
+                native_government:      0i64,
+                native_tax_value:       0i64,
+                native_type:            0i64,
+                native_tax_rate:        0i64,
+                native_happy_points:    80i64,
+                native_happy_change:    1i64,
+                info_turn:              7i64,
+                debris_disk:            0i64,
+                flag:                   1i64,
+                ready_status:           1i64,
+                image:                  "http://library.vgaplanets.nu/planets/150.png".to_string(),
+                native_race_name:       "none".to_string(),
+                native_government_name: "?".to_string(),
+                id:                     452i64,
+            }],
+            ships: vec![Ship {
+                friendly_code: "".to_string(),
+                name: "Medium Deep Space Freighter".to_string(),
+                warp: 9i64,
+                position: (1885i64, 1297i64),
+                beams: 0i64,
+                bays: 0i64,
+                torps: 0i64,
+                mission: 0i64,
+                mission_1_target: 0i64,
+                mission_2_target: 0i64,
+                enemy: 0i64,
+                damage: -1i64,
+                crew: -1i64,
+                clans: 0i64,
+                neutronium: 0i64,
+                tritanium: 0i64,
+                duranium: 0i64,
+                molybdenum: 0i64,
+                supplies: 0i64,
+                ammo: 0i64,
+                megacredits: 0i64,
+                transfer_clans: 0i64,
+                transfer_neutronium: 0i64,
+                transfer_duranium: 0i64,
+                transfer_tritanium: 0i64,
+                transfer_molybdenum: 0i64,
+                transfer_supplies: 0i64,
+                transfer_ammo: 0i64,
+                transfer_megacredits: 0i64,
+                transfer_target_id: 0i64,
+                transfer_target_type: 0i64,
+                target_position: (1885i64, 1300i64),
+                mass: 212i64,
+                heading: 0i64,
+                turn: 0i64,
+                turn_killed: 0i64,
+                beam_id: 0i64,
+                engine_id: 0i64,
+                hull_id: 16i64,
+                owner_id: 1i64,
+                torpedo_id: 0i64,
+                experience: 0i64,
+                info_turn: 7i64,
+                goal: 0i64,
+                goal_target: 0i64,
+                goal_target_2: 0i64,
+                waypoints: vec![(2626i64, 1482i64)],
+                history: vec![(2584i64, 1544i64), (2543i64, 1592i64), (2545i64, 1635i64), (2543i64, 1592i64)],
+                is_cloaked: false,
+                ready_status: 0i64,
+                id: 1i64,
+            }],
+            //ion_storms: 
+            //nebulas: 
+            //stars: 
+            //starbases: 
+            //stock: 
+            minefields: vec![Minefield {
+                owner_id: 7i64,
+                is_web: true,
+                units: 1253i64,
+                info_turn: 17i64,
+                friendly_code: "???".to_string(),
+                position: (2729i64, 2335i64),
+                radius: 35i64,
+                id: 1i64,
+            }],
+            //relations: 
+            //messages: 
+            //my_messages: 
+            //notes: 
+            //vcrs: 
+            //races: 
+            //hulls: 
+            //race_hulls: 
+            //beams: 
+            //engines: 
+            //torpedos: 
+            //advantages: 
             account_settings: PlayerSettings {
                 player_planet_colors: (
                     RGB { red: 0xccu8, green: 0xffu8, blue: 0xffu8 },

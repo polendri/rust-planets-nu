@@ -24,9 +24,24 @@ impl fmt::Show for RGB {
 }
 
 /// Converts a string of the form "#XXXXXX" (where X is a hex digit) to an RGB object.
+///
+/// Also supports some text strings like "green" or "blue".
 pub fn to_rgb(rgb_str: &str) -> Result<RGB, error::Error> {
+    match rgb_str {
+        "red"     => return Ok(RGB { red: 0xffu8, green: 0x00u8, blue: 0x00u8 }),
+        "orange"  => return Ok(RGB { red: 0xffu8, green: 0x80u8, blue: 0x00u8 }),
+        "yellow"  => return Ok(RGB { red: 0xffu8, green: 0xffu8, blue: 0x00u8 }),
+        "green"   => return Ok(RGB { red: 0x00u8, green: 0xffu8, blue: 0x00u8 }),
+        "cyan"    => return Ok(RGB { red: 0x00u8, green: 0xffu8, blue: 0xffu8 }),
+        "blue"    => return Ok(RGB { red: 0x00u8, green: 0x00u8, blue: 0xffu8 }),
+        "purple"  => return Ok(RGB { red: 0x80u8, green: 0x00u8, blue: 0xffu8 }),
+        "magenta" => return Ok(RGB { red: 0xffu8, green: 0x00u8, blue: 0xffu8 }),
+        "pink"    => return Ok(RGB { red: 0xffu8, green: 0x00u8, blue: 0x80u8 }),
+        _         => (),
+    }
+
     let str_to_err = |string| { error::Error::new(error::LibError, string) };
-    let short_err = str_to_err("RGB string is too short.".to_string());
+    let short_err = str_to_err(format!("RGB string is too short. ({})", rgb_str));
     let long_err = str_to_err("RGB string is too long.".to_string());
     let digit_err = str_to_err("Encountered a non-hex digit.".to_string());
     let len = rgb_str.len();
