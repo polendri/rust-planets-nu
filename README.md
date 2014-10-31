@@ -1,7 +1,9 @@
 rust-planets.nu
 ===============
 
-A Rust wrapper for the planets.nu API. It is currently a work in progress and is in no way usable.
+A Rust wrapper for the planets.nu API. While it is by no means complete or polished, it is usable.
+
+![Build Status](https://travis-ci.org/pshendry/rust-planets-nu.svg?branch=master)
 
 Prerequisites
 -------------
