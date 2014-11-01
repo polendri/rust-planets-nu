@@ -74,6 +74,9 @@ use self::planets_nu::parse;
         ```
     * [Reference](http://www.rust-ci.org/pshendry/rust-planets-nu/doc/planets_nu/request/fn.list_games.html)
   * **Load Turn:**
+    * Note: Support is incomplete. The following parts of the Load Turn results are currently
+      not supported: maps, ionstorms, nebulas, stars, starbases, stock, relations, messages,
+      mymessages, notes, vcrs, races, hulls, racehulls, beams, engines, torpedos, advantages.
     * Example:
 
         ```rust
