@@ -7,7 +7,7 @@ use self::serialize::json;
 use std::collections;
 
 use error;
-use json_helpers::{find, get_i64};
+use json_helpers::{find, get_i32};
 
 // Public
 
@@ -23,10 +23,10 @@ pub fn map_with_err<T, R, E>(vec: &Vec<T>, f: |&T| -> Result<R, E>) -> Result<Ve
 }
 
 /// Reads an (x,y) coordinate pair from a JSON object.
-pub fn get_coordinates(obj: &json::Json) -> Result<(i64, i64), error::Error> {
+pub fn get_coordinates(obj: &json::Json) -> Result<(i32, i32), error::Error> {
     match *obj {
         json::Object(ref map) => Ok(
-            (try!(get_i64(try!(find(map, "x")))), try!(get_i64(try!(find(map, "y")))))),
+            (try!(get_i32(try!(find(map, "x")))), try!(get_i32(try!(find(map, "y")))))),
         _ => Err(error::Error::new(
             error::LibError,
             "Expected a JSON coordinate object but found something else.".to_string())),
@@ -82,14 +82,14 @@ mod tests {
 
     #[test]
     fn test_get_coordinates() {
-        assert_eq!((123i64, 4i64), get_coordinates(&json::from_str("{ \"x\": 123, \"y\": 4 }").unwrap()).unwrap());
+        assert_eq!((123i32, 4i32), get_coordinates(&json::from_str("{ \"x\": 123, \"y\": 4 }").unwrap()).unwrap());
     }
 
     #[test]
     fn test_check_success_errors() {
         let mut map = collections::TreeMap::new();
         assert_eq!(error::PlanetsNuError, check_success(&map).unwrap_err().kind); // no "success" key
-        map.insert("success".to_string(), json::I64(1337i64));
+        map.insert("success".to_string(), json::I64(1337));
         assert_eq!(error::PlanetsNuError, check_success(&map).unwrap_err().kind); // wrong type for "success" key
         map.insert("success".to_string(), json::Boolean(false));
         assert_eq!(error::PlanetsNuError, check_success(&map).unwrap_err().kind); // request failed, unknown reason

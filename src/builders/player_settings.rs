@@ -4,7 +4,7 @@ use self::serialize::json;
 
 use data::{mod, RGB};
 use error;
-use json_helpers::{find, get_bool, get_i64, get_object, get_string};
+use json_helpers::{find, get_bool, get_i32, get_object, get_string};
 
 // Public
 
@@ -45,9 +45,9 @@ pub struct PlayerSettings {
     pub sound_effects_enabled: bool,
     /// Whether or not music is enabled.
     pub music_enabled: bool,
-    pub battle_task_id: i64,
-    pub battle_tutorial_id: i64,
-    pub id: i64,
+    pub battle_task_id: i32,
+    pub battle_tutorial_id: i32,
+    pub id: i32,
 }
 
 pub fn build(json: &json::Json) -> Result<PlayerSettings, error::Error> {
@@ -96,11 +96,11 @@ pub fn build(json: &json::Json) -> Result<PlayerSettings, error::Error> {
         music_enabled:
             try!(get_bool(try!(find(map, "musicon")))),
         battle_task_id:
-            try!(get_i64(try!(find(map, "battletaskid")))),
+            try!(get_i32(try!(find(map, "battletaskid")))),
         battle_tutorial_id:
-            try!(get_i64(try!(find(map, "battletutorialid")))),
+            try!(get_i32(try!(find(map, "battletutorialid")))),
         id:
-            try!(get_i64(try!(find(map, "id")))),
+            try!(get_i32(try!(find(map, "id")))),
     })
 }
 

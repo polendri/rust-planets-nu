@@ -62,10 +62,16 @@ pub fn get_bool<'a>(json_enum: &'a json::Json) -> Result<bool, error::Error> {
 }
 
 /// Gets the value of a JSON integer, returning an error if it is not an integer.
-pub fn get_i64<'a>(json_enum: &'a json::Json) -> Result<i64, error::Error> {
+pub fn get_i32<'a>(json_enum: &'a json::Json) -> Result<i32, error::Error> {
     match *json_enum {
-        json::I64(x) => Ok(x),
-        json::U64(x) => Ok(x as i64),
+        json::I64(x) => match x.to_i32() {
+            Some(x) => Ok(x),
+            None => mk_lib_err(format!("Integer overflow trying to convert to i32: {} is too big.", x)),
+        },
+        json::U64(x) => match x.to_i32() {
+            Some(x) => Ok(x),
+            None => mk_lib_err(format!("Integer overflow trying to convert to i32: {} is too big.", x)),
+        },
         _ => mk_lib_err(format!("Expected int but found something else: {}", *json_enum)),
     }
 }

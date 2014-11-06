@@ -3,7 +3,11 @@ extern crate serialize;
 use self::serialize::json;
 
 use error;
-use json_helpers::{find, get_bool, get_float, get_i64, get_object, get_string};
+use json_helpers::{find, get_bool, get_float, get_i32, get_object, get_string};
+
+macro_rules! get(
+    ($i1:ident, $e:expr, $i2:ident) => (try!($i2(try!(find($i1, $e)))))
+)
 
 // Public
 
@@ -12,27 +16,27 @@ pub struct Game {
     pub name: String,
     pub description: String,
     pub short_description: String,
-    pub status: i64,
+    pub status: i32,
     pub created_datetime: String,
     pub ended_datetime: String,
-    pub map_type: i64,
-    pub game_type: i64,
-    pub win_condition: i64,
+    pub map_type: i32,
+    pub game_type: i32,
+    pub win_condition: i32,
     pub difficulty: String,
-    pub tutorial_id: i64,
-    pub required_level_id: i64,
-    pub max_level_id: i64,
-    pub master_planet_id: i64,
-    pub quadrant: i64,
-    pub min_tenacity: i64,
-    pub fast_start: i64,
-    pub turns_per_week: i64,
-    pub year_started: i64,
+    pub tutorial_id: i32,
+    pub required_level_id: i32,
+    pub max_level_id: i32,
+    pub master_planet_id: i32,
+    pub quadrant: i32,
+    pub min_tenacity: i32,
+    pub fast_start: i32,
+    pub turns_per_week: i32,
+    pub year_started: i32,
     pub is_private: bool,
-    pub scenario_id: i64,
+    pub scenario_id: i32,
     pub created_by: String,
-    pub turn: i64,
-    pub slots: i64,
+    pub turn: i32,
+    pub slots: i32,
     pub turn_status: String,
     pub host_days: String,
     pub slow_host_days: String,
@@ -50,96 +54,54 @@ pub struct Game {
     pub status_name: String,
     pub just_ended: bool,
     pub time_to_host: String,
-    pub id: i64,
+    pub id: i32,
 }
 
 pub fn build(json: &json::Json) -> Result<Game, error::Error> {
     let map = try!(get_object(json));
     Ok(Game {
-        name:
-            try!(get_string(try!(find(map, "name")))),
-        description:
-            try!(get_string(try!(find(map, "description")))),
-        short_description:
-            try!(get_string(try!(find(map, "shortdescription")))),
-        status:
-            try!(get_i64(try!(find(map, "status")))),
-        created_datetime:
-            try!(get_string(try!(find(map, "datecreated")))),
-        ended_datetime:
-            try!(get_string(try!(find(map, "dateended")))),
-        map_type:
-            try!(get_i64(try!(find(map, "maptype")))),
-        game_type:
-            try!(get_i64(try!(find(map, "gametype")))),
-        win_condition:
-            try!(get_i64(try!(find(map, "wincondition")))),
-        difficulty:
-            try!(get_float(try!(find(map, "difficulty")), 15u)),
-        tutorial_id:
-            try!(get_i64(try!(find(map, "tutorialid")))),
-        required_level_id:
-            try!(get_i64(try!(find(map, "requiredlevelid")))),
-        max_level_id:
-            try!(get_i64(try!(find(map, "maxlevelid")))),
-        master_planet_id:
-            try!(get_i64(try!(find(map, "masterplanetid")))),
-        quadrant:
-            try!(get_i64(try!(find(map, "quadrant")))),
-        min_tenacity:
-            try!(get_i64(try!(find(map, "mintenacity")))),
-        fast_start:
-            try!(get_i64(try!(find(map, "faststart")))),
-        turns_per_week:
-            try!(get_i64(try!(find(map, "turnsperweek")))),
-        year_started:
-            try!(get_i64(try!(find(map, "yearstarted")))),
-        is_private:
-            try!(get_bool(try!(find(map, "isprivate")))),
-        scenario_id:
-            try!(get_i64(try!(find(map, "scenarioid")))),
-        created_by:
-            try!(get_string(try!(find(map, "createdby")))),
-        turn:
-            try!(get_i64(try!(find(map, "turn")))),
-        slots:
-            try!(get_i64(try!(find(map, "slots")))),
-        turn_status:
-            try!(get_string(try!(find(map, "turnstatus")))),
-        host_days:
-            try!(get_string(try!(find(map, "hostdays")))),
-        slow_host_days:
-            try!(get_string(try!(find(map, "slowhostdays")))),
-        host_time:
-            try!(get_string(try!(find(map, "hosttime")))),
-        last_backup_path:
-            try!(get_string(try!(find(map, "lastbackuppath")))),
-        next_host_datetime:
-            try!(get_string(try!(find(map, "nexthost")))),
-        all_turns_in:
-            try!(get_bool(try!(find(map, "allturnsin")))),
-        last_notified:
-            try!(get_bool(try!(find(map, "lastnotified")))),
-        is_hosting:
-            try!(get_bool(try!(find(map, "ishosting")))),
-        last_loaded_datetime:
-            try!(get_string(try!(find(map, "lastloadeddate")))),
-        deleted_datetime:
-            try!(get_string(try!(find(map, "deletedate")))),
-        last_host_datetime:
-            try!(get_string(try!(find(map, "lasthostdate")))),
-        password:
-            try!(get_string(try!(find(map, "password")))),
-        has_password:
-            try!(get_bool(try!(find(map, "haspassword")))),
-        status_name:
-            try!(get_string(try!(find(map, "statusname")))),
-        just_ended:
-            try!(get_bool(try!(find(map, "justended")))),
-        time_to_host:
-            try!(get_string(try!(find(map, "timetohost")))),
-        id:
-            try!(get_i64(try!(find(map, "id")))),
+        name:                 get!(map, "name", get_string),
+        description:          get!(map, "description", get_string),
+        short_description:    get!(map, "shortdescription", get_string),
+        status:               get!(map, "status", get_i32),
+        created_datetime:     get!(map, "datecreated", get_string),
+        ended_datetime:       get!(map, "dateended", get_string),
+        map_type:             get!(map, "maptype", get_i32),
+        game_type:            get!(map, "gametype", get_i32),
+        win_condition:        get!(map, "wincondition", get_i32),
+        difficulty:           try!(get_float(try!(find(map, "difficulty")), 15u)),
+        tutorial_id:          get!(map, "tutorialid", get_i32),
+        required_level_id:    get!(map, "requiredlevelid", get_i32),
+        max_level_id:         get!(map, "maxlevelid", get_i32),
+        master_planet_id:     get!(map, "masterplanetid", get_i32),
+        quadrant:             get!(map, "quadrant", get_i32),
+        min_tenacity:         get!(map, "mintenacity", get_i32),
+        fast_start:           get!(map, "faststart", get_i32),
+        turns_per_week:       get!(map, "turnsperweek", get_i32),
+        year_started:         get!(map, "yearstarted", get_i32),
+        is_private:           get!(map, "isprivate", get_bool),
+        scenario_id:          get!(map, "scenarioid", get_i32),
+        created_by:           get!(map, "createdby", get_string),
+        turn:                 get!(map, "turn", get_i32),
+        slots:                get!(map, "slots", get_i32),
+        turn_status:          get!(map, "turnstatus", get_string),
+        host_days:            get!(map, "hostdays", get_string),
+        slow_host_days:       get!(map, "slowhostdays", get_string),
+        host_time:            get!(map, "hosttime", get_string),
+        last_backup_path:     get!(map, "lastbackuppath", get_string),
+        next_host_datetime:   get!(map, "nexthost", get_string),
+        all_turns_in:         get!(map, "allturnsin", get_bool),
+        last_notified:        get!(map, "lastnotified", get_bool),
+        is_hosting:           get!(map, "ishosting", get_bool),
+        last_loaded_datetime: get!(map, "lastloadeddate", get_string),
+        deleted_datetime:     get!(map, "deletedate", get_string),
+        last_host_datetime:   get!(map, "lasthostdate", get_string),
+        password:             get!(map, "password", get_string),
+        has_password:         get!(map, "haspassword", get_bool),
+        status_name:          get!(map, "statusname", get_string),
+        just_ended:           get!(map, "justended", get_bool),
+        time_to_host:         get!(map, "timetohost", get_string),
+        id:                   get!(map, "id", get_i32),
     })
 }
 
@@ -202,27 +164,27 @@ mod tests {
                 "This is a battle for the Vevalgoz Sector. This is a default configuration game. \
                 Custom map. This game has 2 turns per week.".to_string(),
             short_description: "".to_string(),
-            status: 2i64,
+            status: 2,
             created_datetime: "10/8/2011 12:04:45 PM".to_string(),
             ended_datetime: "1/1/0001 12:00:00 AM".to_string(),
-            map_type: 2i64,
-            game_type: 2i64,
-            win_condition: 1i64,
+            map_type: 2,
+            game_type: 2,
+            win_condition: 1,
             difficulty: "0.881292261457551".to_string(),
-            tutorial_id: 0i64,
-            required_level_id: 0i64,
-            max_level_id: 0i64,
-            master_planet_id: 257i64,
-            quadrant: 20i64,
-            min_tenacity: 0i64,
-            fast_start: 0i64,
-            turns_per_week: 2i64,
-            year_started: 10i64,
+            tutorial_id: 0,
+            required_level_id: 0,
+            max_level_id: 0,
+            master_planet_id: 257,
+            quadrant: 20,
+            min_tenacity: 0,
+            fast_start: 0,
+            turns_per_week: 2,
+            year_started: 10,
             is_private: false,
-            scenario_id: 0i64,
+            scenario_id: 0,
             created_by: "none".to_string(),
-            turn: 327i64,
-            slots: 11i64,
+            turn: 327,
+            slots: 11,
             turn_status: "x2_x_x_x9_B".to_string(),
             host_days: "S___T__".to_string(),
             slow_host_days: "".to_string(),
@@ -240,7 +202,7 @@ mod tests {
             status_name: "Running".to_string(),
             just_ended: false,
             time_to_host: "Next turn in 27 hours".to_string(),
-            id: 25164i64,
+            id: 25164,
         };
         assert_eq!(result, build(&parse(json).unwrap()).unwrap());
     }
