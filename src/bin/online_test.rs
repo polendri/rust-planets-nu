@@ -30,8 +30,8 @@ fn main() {
             request::PublicScope,
             &Vec::new(),
             None,
-            Some(0i64)));
-    print_result("load_turn", request::load_turn(815i64, None, None, Some(1i64), false));
+            Some(0i32)));
+    print_result("load_turn", request::load_turn(815i32, None, None, Some(1i32), false));
 
     println!("\nOnline test run has completed.");
 }

@@ -72,9 +72,9 @@ pub fn list_games(
     status: GameStatusFlags,
     game_type: GameTypeFlags,
     scope: GameScope,
-    ids: &Vec<i64>,
+    ids: &Vec<i32>,
     username: Option<&str>,
-    limit: Option<i64>) -> Result<Vec<game::Game>, error::Error>
+    limit: Option<i32>) -> Result<Vec<game::Game>, error::Error>
 {
     let url = build_games_list_url(status, game_type, scope, ids, username, limit);
     let response = try!(http_get(url.as_slice()));
@@ -94,10 +94,10 @@ pub fn list_games(
 /// for_save: Indicates if the client intends to make a call to the save turn API.
 // TODO: document the parameters better
 pub fn load_turn(
-    game_id: i64,
-    turn: Option<i64>,
+    game_id: i32,
+    turn: Option<i32>,
     api_key: Option<&str>,
-    player_id: Option<i64>,
+    player_id: Option<i32>,
     for_save: bool) -> Result<load_turn::LoadTurnResult, error::Error>
 {
 
@@ -141,9 +141,9 @@ fn type_flags_to_str(flags: GameTypeFlags) -> Option<String> {
 fn build_games_list_url(status: GameStatusFlags,
                         game_type: GameTypeFlags,
                         scope: GameScope,
-                        ids: &Vec<i64>,
+                        ids: &Vec<i32>,
                         username: Option<&str>,
-                        limit: Option<i64>) -> String {
+                        limit: Option<i32>) -> String {
     let mut url = "http://api.planets.nu/games/list".to_string();
     let mut prepend_char = "?".to_string();
 
@@ -200,10 +200,10 @@ fn build_games_list_url(status: GameStatusFlags,
 }
 
 /// Builds the URL used for the load turn API.
-fn build_load_turn_url(game_id: i64,
-                       turn: Option<i64>,
+fn build_load_turn_url(game_id: i32,
+                       turn: Option<i32>,
                        api_key: Option<&str>,
-                       player_id: Option<i64>,
+                       player_id: Option<i32>,
                        for_save: bool) -> String {
     let mut url = "http://api.planets.nu/game/loadturn?gameid=".to_string() + game_id.to_string();
 
@@ -311,7 +311,7 @@ mod tests {
                 request::CustomScope,
                 &vec![12,13371337],
                 Some("theuser"),
-                Some(123i64)).as_slice());
+                Some(123i32)).as_slice());
     }
 
     #[test]
@@ -325,6 +325,6 @@ mod tests {
     fn test_build_load_turn_url() {
         assert_eq!(
             "http://api.planets.nu/game/loadturn?gameid=1337&turn=5&apikey=theapikey&playerid=123&forsave=true",
-            build_load_turn_url(1337, Some(5i64), Some("theapikey"), Some(123i64), true).as_slice());
+            build_load_turn_url(1337, Some(5i32), Some("theapikey"), Some(123i32), true).as_slice());
     }
 }
