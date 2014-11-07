@@ -52,7 +52,7 @@ use self::planets_nu::parse;
     * Example:
 
         ```rust
-        let result = request::login("username", "password");
+        let result = request::login("username".to_string(), "password".to_string());
         //let result = parse::login("[json string]");
         print!(result);
         ```

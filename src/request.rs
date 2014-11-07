@@ -3,6 +3,7 @@ Functions to make requests against the planets.nu API.
 */
 extern crate curl;
 extern crate flate2;
+extern crate url;
 
 use self::curl::http;
 use self::flate2::reader::GzDecoder;
@@ -49,8 +50,11 @@ pub enum GameScope {
 ///
 /// The purpose of this call is to retrieve an API key that can be passed along in other API
 /// requests. It also retrieves the settings for the user.
-pub fn login(username: &str, password: &str) -> Result<login::LoginResult, error::Error> {
-    let url = format!("http://api.planets.nu/login?username={0}&password={1}", username, password);
+pub fn login(username: String, password: String) -> Result<login::LoginResult, error::Error> {
+    let url = format!(
+        "http://api.planets.nu/login?username={0}&password={1}",
+        percent_encode(username),
+        percent_encode(password));
     let response = try!(http_get(url.as_slice()));
     parse::login(try!(decode_response(&response)).as_slice())
 }
@@ -73,7 +77,7 @@ pub fn list_games(
     game_type: GameTypeFlags,
     scope: GameScope,
     ids: &Vec<i32>,
-    username: Option<&str>,
+    username: Option<String>,
     limit: Option<i32>) -> Result<Vec<game::Game>, error::Error>
 {
     let url = build_games_list_url(status, game_type, scope, ids, username, limit);
@@ -96,7 +100,7 @@ pub fn list_games(
 pub fn load_turn(
     game_id: i32,
     turn: Option<i32>,
-    api_key: Option<&str>,
+    api_key: Option<String>,
     player_id: Option<i32>,
     for_save: bool) -> Result<load_turn::LoadTurnResult, error::Error>
 {
@@ -142,7 +146,7 @@ fn build_games_list_url(status: GameStatusFlags,
                         game_type: GameTypeFlags,
                         scope: GameScope,
                         ids: &Vec<i32>,
-                        username: Option<&str>,
+                        username: Option<String>,
                         limit: Option<i32>) -> String {
     let mut url = "http://api.planets.nu/games/list".to_string();
     let mut prepend_char = "?".to_string();
@@ -183,7 +187,7 @@ fn build_games_list_url(status: GameStatusFlags,
 
     match username {
         Some(s) => {
-            url = url + prepend_char + "username=" + s;
+            url = url + prepend_char + "username=" + percent_encode(s);
             prepend_char = "&".to_string();
         },
         None => (),
@@ -202,7 +206,7 @@ fn build_games_list_url(status: GameStatusFlags,
 /// Builds the URL used for the load turn API.
 fn build_load_turn_url(game_id: i32,
                        turn: Option<i32>,
-                       api_key: Option<&str>,
+                       api_key: Option<String>,
                        player_id: Option<i32>,
                        for_save: bool) -> String {
     let mut url = "http://api.planets.nu/game/loadturn?gameid=".to_string() + game_id.to_string();
@@ -278,6 +282,11 @@ fn bytes_to_str<'a>(bytes: &'a [u8]) -> Result<&'a str, error::Error> {
     }
 }
 
+/// Percent encodes a string.
+fn percent_encode(input: String) -> String {
+    url::percent_encode(input.into_bytes().as_slice(), url::DEFAULT_ENCODE_SET)
+}
+
 // Tests
 
 #[cfg(test)]
@@ -310,7 +319,7 @@ mod tests {
                 request::GAME_TYPE_TRAINING | request::GAME_TYPE_MELEE,
                 request::CustomScope,
                 &vec![12,13371337],
-                Some("theuser"),
+                Some("theuser".to_string()),
                 Some(123i32)).as_slice());
     }
 
@@ -325,6 +334,6 @@ mod tests {
     fn test_build_load_turn_url() {
         assert_eq!(
             "http://api.planets.nu/game/loadturn?gameid=1337&turn=5&apikey=theapikey&playerid=123&forsave=true",
-            build_load_turn_url(1337, Some(5i32), Some("theapikey"), Some(123i32), true).as_slice());
+            build_load_turn_url(1337, Some(5i32), Some("theapikey".to_string()), Some(123i32), true).as_slice());
     }
 }

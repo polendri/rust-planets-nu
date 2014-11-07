@@ -21,7 +21,7 @@ fn print_result<T: fmt::Show>(name: &str, result: Result<T, error::Error>) {
 fn main() {
     println!("Online test run has begun.\n");
 
-    print_result("login", request::login("rusty314159", "rusty314159"));
+    print_result("login", request::login("rusty314159".to_string(), "rusty314159".to_string()));
     print_result(
         "list_games",
         request::list_games(
