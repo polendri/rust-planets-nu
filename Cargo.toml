@@ -1,6 +1,6 @@
 [package]
 name = "planets_nu"
-version = "0.0.1"
+version = "0.1.0"
 authors = ["Paul Hendry <paul@pshendry.com>"]
 
 [lib]
