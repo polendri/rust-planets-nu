@@ -19,6 +19,10 @@ use parse;
 
 // Public
 
+pub use builders::game::Game;
+pub use builders::load_turn::LoadTurnResult;
+pub use builders::login::LoginResult;
+
 bitflags! {
     flags GameStatusFlags: u8 {
         const STATUS_DEFAULT  = 0x00,
