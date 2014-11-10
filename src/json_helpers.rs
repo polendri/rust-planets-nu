@@ -26,7 +26,7 @@ pub fn parse(json: &str) -> Result<json::Json, error::Error> {
 
 /// Finds a key in the map, or else returns an error.
 pub fn find<'a>(map: &'a collections::TreeMap<String, json::Json>, key: &str) -> Result<&'a json::Json, error::Error> {
-    match (*map).find(&key.to_string()) {
+    match (*map).get(&key.to_string()) {
         Some(x) => Ok(x),
         None => mk_lib_err(format!("Could not find key '{}'.", key)),
     }

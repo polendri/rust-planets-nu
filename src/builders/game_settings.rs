@@ -5,6 +5,10 @@ use self::serialize::json;
 use error;
 use json_helpers::{find, get_bool, get_float, get_i32, get_object, get_string};
 
+macro_rules! get(
+    ($i1:ident, $e:expr, $i2:ident) => (try!($i2(try!(find($i1, $e)))))
+)
+
 // Public
 
 #[deriving(Eq, PartialEq, Show)]
@@ -82,10 +86,6 @@ pub struct GameSettings {
     pub campaign_mode: bool,
     pub max_advantage: i32,
     pub fascist_double_beams: bool,
-    pub production_queue: bool,
-    pub production_base_cost: i32,
-    pub production_starbase_output: i32,
-    pub production_starbase_reward: i32,
     pub end_turn: i32,
     pub id: i32,
 }
@@ -93,164 +93,81 @@ pub struct GameSettings {
 pub fn build(json: &json::Json) -> Result<GameSettings, error::Error> {
     let map = try!(get_object(json));
     Ok(GameSettings {
-        name:
-            try!(get_string(try!(find(map, "name")))),
-        turn:
-            try!(get_i32(try!(find(map, "turn")))),
-        build_queue_planet_id:
-            try!(get_i32(try!(find(map, "buildqueueplanetid")))),
-        victory_countdown:
-            try!(get_i32(try!(find(map, "victorycountdown")))),
-        max_allies:
-            try!(get_i32(try!(find(map, "maxallies")))),
-        map_width:
-            try!(get_i32(try!(find(map, "mapwidth")))),
-        map_height:
-            try!(get_i32(try!(find(map, "mapheight")))),
-        num_planets:
-            try!(get_i32(try!(find(map, "numplanets")))),
-        ship_limit:
-            try!(get_i32(try!(find(map, "shiplimit")))),
-        host_start_datetime:
-            try!(get_string(try!(find(map, "hoststart")))),
-        host_completed_datetime:
-            try!(get_string(try!(find(map, "hostcompleted")))),
-        next_host_datetime:
-            try!(get_string(try!(find(map, "nexthost")))),
-        last_invite_datetime:
-            try!(get_string(try!(find(map, "lastinvite")))),
-        team_size:
-            try!(get_i32(try!(find(map, "teamsize")))),
-        planet_scan_range:
-            try!(get_i32(try!(find(map, "planetscanrange")))),
-        ship_scan_range:
-            try!(get_i32(try!(find(map, "shipscanrange")))),
-        all_visible:
-            try!(get_bool(try!(find(map, "allvisible")))),
-        minefields_visible:
-            try!(get_bool(try!(find(map, "minefieldsvisible")))),
-        nebulas:
-            try!(get_i32(try!(find(map, "nebulas")))),
-        stars:
-            try!(get_i32(try!(find(map, "stars")))),
-        discussion_id:
-            try!(get_string(try!(find(map, "discussionid")))),
-        nu_ion_storms:
-            try!(get_bool(try!(find(map, "nuionstorms")))),
-        max_ion_storms:
-            try!(get_i32(try!(find(map, "maxions")))),
-        max_ion_clouds_per_storm:
-            try!(get_i32(try!(find(map, "maxioncloudsperstorm")))),
-        debris_disk_percent:
-            try!(get_i32(try!(find(map, "debrisdiskpercent")))),
-        debris_disk_version:
-            try!(get_i32(try!(find(map, "debrisdiskversion")))),
-        cloak_fail:
-            try!(get_i32(try!(find(map, "cloakfail")))),
-        structure_decay_rate:
-            try!(get_i32(try!(find(map, "structuredecayrate")))),
-        map_shape:
-            try!(get_i32(try!(find(map, "mapshape")))),
-        very_close_planets:
-            try!(get_i32(try!(find(map, "verycloseplanets")))),
-        close_planets:
-            try!(get_i32(try!(find(map, "closeplanets")))),
-        other_planets_min_homeworld_dist:
-            try!(get_i32(try!(find(map, "otherplanetsminhomeworlddist")))),
-        n_circles:
-            try!(get_i32(try!(find(map, "ncircles")))),
-        hw_distribution:
-            try!(get_i32(try!(find(map, "hwdistribution")))),
-        n_debris_discs:
-            try!(get_i32(try!(find(map, "ndebrisdiscs")))),
-        level_id:
-            try!(get_i32(try!(find(map, "levelid")))),
-        next_level_id:
-            try!(get_i32(try!(find(map, "nextlevelid")))),
-        kill_race:
-            try!(get_bool(try!(find(map, "killrace")))),
-        running_start:
-            try!(get_i32(try!(find(map, "runningstart")))),
-        dead_radius:
-            try!(get_i32(try!(find(map, "deadradius")))),
-        player_select_race:
-            try!(get_bool(try!(find(map, "playerselectrace")))),
-        military_score_percent:
-            try!(get_i32(try!(find(map, "militaryscorepercent")))),
-        hide_race_selection:
-            try!(get_bool(try!(find(map, "hideraceselection")))),
-        fixed_start_positions:
-            try!(get_bool(try!(find(map, "fixedstartpositions")))),
-        min_native_clans:
-            try!(get_i32(try!(find(map, "minnativeclans")))),
-        max_native_clans:
-            try!(get_i32(try!(find(map, "maxnativeclans")))),
-        homeworld_has_starbase:
-            try!(get_bool(try!(find(map, "homeworldhasstarbase")))),
-        homeworld_clans:
-            try!(get_i32(try!(find(map, "homeworldclans")))),
-        homeworld_resources:
-            try!(get_i32(try!(find(map, "homeworldresources")))),
-        game_password:
-            try!(get_string(try!(find(map, "gamepassword")))),
-        neutronium_level:
-            try!(get_float(try!(find(map, "neutroniumlevel")), 2u)),
-        duranium_level:
-            try!(get_float(try!(find(map, "duraniumlevel")), 2u)),
-        tritanium_level:
-            try!(get_float(try!(find(map, "tritaniumlevel")), 2u)),
-        molybdenum_level:
-            try!(get_float(try!(find(map, "molybdenumlevel")), 2u)),
-        average_density_percent:
-            try!(get_i32(try!(find(map, "averagedensitypercent")))),
-        development_factor:
-            try!(get_i32(try!(find(map, "developmentfactor")))),
-        native_probability:
-            try!(get_i32(try!(find(map, "nativeprobability")))),
-        native_government_level:
-            try!(get_i32(try!(find(map, "nativegovernmentlevel")))),
-        max_surface_neutronium:
-            try!(get_i32(try!(find(map, "neusurfacemax")))),
-        max_surface_duranium:
-            try!(get_i32(try!(find(map, "dursurfacemax")))),
-        max_surface_tritanium:
-            try!(get_i32(try!(find(map, "trisurfacemax")))),
-        max_surface_molybdenum:
-            try!(get_i32(try!(find(map, "molsurfacemax")))),
-        max_ground_neutronium:
-            try!(get_i32(try!(find(map, "neugroundmax")))),
-        max_ground_duranium:
-            try!(get_i32(try!(find(map, "durgroundmax")))),
-        max_ground_tritanium:
-            try!(get_i32(try!(find(map, "trigroundmax")))),
-        max_ground_molybdenum:
-            try!(get_i32(try!(find(map, "molgroundmax")))),
-        computer_build_ships:
-            try!(get_bool(try!(find(map, "computerbuildships")))),
-        computer_build_delay:
-            try!(get_i32(try!(find(map, "computerbuilddelay")))),
-        fight_or_fail:
-            try!(get_i32(try!(find(map, "fightorfail")))),
-        show_all_explosions:
-            try!(get_bool(try!(find(map, "showallexplosions")))),
-        campaign_mode:
-            try!(get_bool(try!(find(map, "campaignmode")))),
-        max_advantage:
-            try!(get_i32(try!(find(map, "maxadvantage")))),
-        fascist_double_beams:
-            try!(get_bool(try!(find(map, "fascistdoublebeams")))),
-        production_queue:
-            try!(get_bool(try!(find(map, "productionqueue")))),
-        production_base_cost:
-            try!(get_i32(try!(find(map, "productionbasecost")))),
-        production_starbase_output:
-            try!(get_i32(try!(find(map, "productionstarbaseoutput")))),
-        production_starbase_reward:
-            try!(get_i32(try!(find(map, "productionstarbasereward")))),
-        end_turn:
-            try!(get_i32(try!(find(map, "endturn")))),
-        id:
-            try!(get_i32(try!(find(map, "id")))),
+        name: get!(map, "name", get_string),
+        turn: get!(map, "turn", get_i32),
+        build_queue_planet_id: get!(map, "buildqueueplanetid", get_i32),
+        victory_countdown: get!(map, "victorycountdown", get_i32),
+        max_allies: get!(map, "maxallies", get_i32),
+        map_width: get!(map, "mapwidth", get_i32),
+        map_height: get!(map, "mapheight", get_i32),
+        num_planets: get!(map, "numplanets", get_i32),
+        ship_limit: get!(map, "shiplimit", get_i32),
+        host_start_datetime: get!(map, "hoststart", get_string),
+        host_completed_datetime: get!(map, "hostcompleted", get_string),
+        next_host_datetime: get!(map, "nexthost", get_string),
+        last_invite_datetime: get!(map, "lastinvite", get_string),
+        team_size: get!(map, "teamsize", get_i32),
+        planet_scan_range: get!(map, "planetscanrange", get_i32),
+        ship_scan_range: get!(map, "shipscanrange", get_i32),
+        all_visible: get!(map, "allvisible", get_bool),
+        minefields_visible: get!(map, "minefieldsvisible", get_bool),
+        nebulas: get!(map, "nebulas", get_i32),
+        stars: get!(map, "stars", get_i32),
+        discussion_id: get!(map, "discussionid", get_string),
+        nu_ion_storms: get!(map, "nuionstorms", get_bool),
+        max_ion_storms: get!(map, "maxions", get_i32),
+        max_ion_clouds_per_storm: get!(map, "maxioncloudsperstorm", get_i32),
+        debris_disk_percent: get!(map, "debrisdiskpercent", get_i32),
+        debris_disk_version: get!(map, "debrisdiskversion", get_i32),
+        cloak_fail: get!(map, "cloakfail", get_i32),
+        structure_decay_rate: get!(map, "structuredecayrate", get_i32),
+        map_shape: get!(map, "mapshape", get_i32),
+        very_close_planets: get!(map, "verycloseplanets", get_i32),
+        close_planets: get!(map, "closeplanets", get_i32),
+        other_planets_min_homeworld_dist: get!(map, "otherplanetsminhomeworlddist", get_i32),
+        n_circles: get!(map, "ncircles", get_i32),
+        hw_distribution: get!(map, "hwdistribution", get_i32),
+        n_debris_discs: get!(map, "ndebrisdiscs", get_i32),
+        level_id: get!(map, "levelid", get_i32),
+        next_level_id: get!(map, "nextlevelid", get_i32),
+        kill_race: get!(map, "killrace", get_bool),
+        running_start: get!(map, "runningstart", get_i32),
+        dead_radius: get!(map, "deadradius", get_i32),
+        player_select_race: get!(map, "playerselectrace", get_bool),
+        military_score_percent: get!(map, "militaryscorepercent", get_i32),
+        hide_race_selection: get!(map, "hideraceselection", get_bool),
+        fixed_start_positions: get!(map, "fixedstartpositions", get_bool),
+        min_native_clans: get!(map, "minnativeclans", get_i32),
+        max_native_clans: get!(map, "maxnativeclans", get_i32),
+        homeworld_has_starbase: get!(map, "homeworldhasstarbase", get_bool),
+        homeworld_clans: get!(map, "homeworldclans", get_i32),
+        homeworld_resources: get!(map, "homeworldresources", get_i32),
+        game_password: get!(map, "gamepassword", get_string),
+        neutronium_level: try!(get_float(try!(find(map, "neutroniumlevel")), 2u)),
+        duranium_level: try!(get_float(try!(find(map, "duraniumlevel")), 2u)),
+        tritanium_level: try!(get_float(try!(find(map, "tritaniumlevel")), 2u)),
+        molybdenum_level: try!(get_float(try!(find(map, "molybdenumlevel")), 2u)),
+        average_density_percent: get!(map, "averagedensitypercent", get_i32),
+        development_factor: get!(map, "developmentfactor", get_i32),
+        native_probability: get!(map, "nativeprobability", get_i32),
+        native_government_level: get!(map, "nativegovernmentlevel", get_i32),
+        max_surface_neutronium: get!(map, "neusurfacemax", get_i32),
+        max_surface_duranium: get!(map, "dursurfacemax", get_i32),
+        max_surface_tritanium: get!(map, "trisurfacemax", get_i32),
+        max_surface_molybdenum: get!(map, "molsurfacemax", get_i32),
+        max_ground_neutronium: get!(map, "neugroundmax", get_i32),
+        max_ground_duranium: get!(map, "durgroundmax", get_i32),
+        max_ground_tritanium: get!(map, "trigroundmax", get_i32),
+        max_ground_molybdenum: get!(map, "molgroundmax", get_i32),
+        computer_build_ships: get!(map, "computerbuildships", get_bool),
+        computer_build_delay: get!(map, "computerbuilddelay", get_i32),
+        fight_or_fail: get!(map, "fightorfail", get_i32),
+        show_all_explosions: get!(map, "showallexplosions", get_bool),
+        campaign_mode: get!(map, "campaignmode", get_bool),
+        max_advantage: get!(map, "maxadvantage", get_i32),
+        fascist_double_beams: get!(map, "fascistdoublebeams", get_bool),
+        end_turn: get!(map, "endturn", get_i32),
+        id: get!(map, "id", get_i32),
     })
 }
 
@@ -418,10 +335,6 @@ mod tests {
             campaign_mode: false,
             max_advantage: 500i32,
             fascist_double_beams: false,
-            production_queue: false,
-            production_base_cost: 1i32,
-            production_starbase_output: 2i32,
-            production_starbase_reward: 2i32,
             end_turn: 100i32,
             id: 0i32,
         };

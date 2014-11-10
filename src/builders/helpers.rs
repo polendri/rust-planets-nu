@@ -36,7 +36,7 @@ pub fn get_coordinates(obj: &json::Json) -> Result<(i32, i32), error::Error> {
 /// Checks for the 'success' key in order to determine whether an API response
 /// indicates success or failure.
 pub fn check_success(map: &collections::TreeMap<String, json::Json>) -> Result<(), error::Error> {
-    let success_value = match (*map).find(&"success".to_string()) {
+    let success_value = match (*map).get(&"success".to_string()) {
         Some(x) => x,
         None => return Err(
             error::Error::new(
@@ -56,7 +56,7 @@ pub fn check_success(map: &collections::TreeMap<String, json::Json>) -> Result<(
             let unknown_err = error::Error::new(
                 error::PlanetsNuError,
                 "Response indicates that the request failed (reason unknown).".to_string());
-            let error_value = match (*map).find(&"error".to_string()) {
+            let error_value = match (*map).get(&"error".to_string()) {
                 Some(x) => x,
                 None => return Err(unknown_err),
             };
