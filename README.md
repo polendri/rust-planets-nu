@@ -1,9 +1,11 @@
+This repository is no longer being maintained. Since Rust has continued to
+evolve since this repo has last been updated, it is doubtless quite
+non-functional and it would take some work to make it compile again.
+
 rust-planets.nu
 ===============
 
 A Rust wrapper for the planets.nu API. While it is by no means complete or polished, it is usable.
-
-![Build Status](https://travis-ci.org/pshendry/rust-planets-nu.svg?branch=master)
 
 Prerequisites
 -------------
